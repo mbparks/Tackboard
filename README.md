@@ -1,26 +1,25 @@
-# TACKBOARD v1.1.1
+# TACKBOARD v1.1.2
 
 **TACKBOARD — A Simple Visual Thinking Space**
 
 TACKBOARD is a calm, local-first virtual whiteboard for arranging freeform sticky notes, structured Kanban notes, stickers, text labels, frames, connectors, and freehand annotations.
 
-## What changed in v1.1.1
+## What changed in v1.1.2
 
-- Left-drag any empty part of the board to pan with the primary mouse button.
-- Hold `Shift` while left-dragging empty board space to draw a selection marquee. Add `Ctrl`/`Cmd` to keep the existing selection while marquee-selecting more objects.
-- `Space + drag` and middle-button drag remain available for panning from any starting point.
-- Added a dedicated **Red X** sticker alongside the green check and red exclamation stickers, bringing the current library to 17 stickers.
-- Retained the complete v1.1.0 sticker system and higher-contrast sticky-note text.
+- Left-click and drag across empty board space now draws a selection rectangle and selects every object the rectangle touches.
+- Hold `Shift`, `Ctrl`, or `Cmd` while left-dragging to add the newly enclosed objects to the current selection.
+- A normal click on empty board space still clears the current selection.
+- After selecting several objects, drag any selected note header or selected movable object to move the complete selection together.
+- Board panning remains available through `Space + drag`, middle-button drag, trackpad scrolling, the minimap, and touch gestures.
+- Updated the Select-tool cursor, in-app shortcut guide, visible version, and offline cache.
 
-## What changed in v1.1.0
+This release intentionally supersedes the primary-button empty-canvas panning behavior introduced in v1.1.1 so the Select tool once again treats an ordinary left-drag as marquee selection.
 
-- Added a reusable sticker tool with 16 built-in stickers: thumbs up, thumbs down, green check, red exclamation, yellow question, blue box, four arrows, star, heart, idea, flag, plus, and minus.
-- Click a sticker in the picker and then click anywhere on the board to place it, including over another board object.
-- On desktop, drag a sticker directly from the picker and drop it onto the board.
-- Stickers can be moved, resized, duplicated, copied, pasted, grouped, aligned, layered, connected, searched, imported, exported, and changed after placement.
-- Darkened all non-charcoal sticky-note text and increased the contrast of labels, placeholders, completed checklist items, and empty Kanban values.
-- Updated dark-theme sticky-note paper colors so the darker ink remains easy to read.
-- Preserved the v1.0.1 text-label centering fix.
+## Included from v1.1.1
+
+- A dedicated **Red X** sticker alongside the green check, red exclamation, thumbs up/down, arrows, and the rest of the sticker library.
+- `Space + drag` and middle-button drag for panning from any starting point.
+- The complete sticker system and higher-contrast sticky-note text introduced in v1.1.0.
 
 ## Run it
 
@@ -50,9 +49,11 @@ Then open `http://localhost:8080`.
 - Use the Sticky Note tool or `Shift + N` to choose Blank Note or Kanban.
 - Use the Sticker tool or `Shift + S` to open the sticker picker. Plain `S` activates the most recently used sticker.
 - Drag a note by its header; stickers and text labels can be dragged from anywhere inside their bounds.
+- Left-drag empty board space to marquee-select multiple objects. Hold `Shift`, `Ctrl`, or `Cmd` to add to the existing selection.
+- Drag one selected object to move the complete multi-object selection together.
+- Hold `Space` while dragging, or use the middle mouse button, to pan from any starting point. Trackpad scrolling also pans; `Ctrl/Cmd + wheel` zooms at the pointer.
 - Select an object to reveal contextual actions, resize handles, and—where applicable—a connector handle.
 - Double-click a note or press `Enter` while selected to edit. Double-click a sticker or press `Enter` while it is selected to change it.
-- Left-drag empty board space to pan. Hold `Shift` while left-dragging to marquee-select. `Space + drag` or middle-button drag pans from any starting point. Use `Ctrl/Cmd + wheel` to zoom.
 - Use the board switcher to create, rename, duplicate, delete, and search boards.
 - Use Export for current-board JSON, selected-object JSON, complete backups, clean PNGs, and browser-generated PDF/print output. PDF/Print supports the entire board on one page, tiled multi-page output, the visible viewport, or the current selection.
 

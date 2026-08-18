@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tackboard-v1.1.1';
+const CACHE_NAME = 'tackboard-v1.1.2';
 const APP_SHELL = ['./', './index.html'];
 
 self.addEventListener('install', event => {

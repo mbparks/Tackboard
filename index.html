@@ -258,7 +258,8 @@
     background: var(--bg);
     outline: none;
   }
-  #viewport[data-tool="select"] { cursor: grab; }
+  #viewport[data-tool="select"] { cursor: default; }
+  #viewport[data-tool="select"].marquee-selecting { cursor: crosshair; }
   #viewport[data-tool="select"] .sticky-note,
   #viewport[data-tool="select"] .frame-object { cursor: default; }
   #viewport[data-tool="pen"] { cursor: crosshair; }
@@ -1032,7 +1033,7 @@
       <div class="brand-mark" aria-hidden="true">T</div>
       <div class="brand-copy">
         <div class="brand-title">TACKBOARD</div>
-        <div class="brand-meta">v1.1.1 · LOCAL &amp; PRIVATE</div>
+        <div class="brand-meta">v1.1.2 · LOCAL &amp; PRIVATE</div>
       </div>
     </div>
 
@@ -1067,7 +1068,7 @@
   </header>
 
   <nav id="toolDock" class="tool-dock" aria-label="Whiteboard tools">
-    <button class="tool-button active" type="button" data-tool="select" aria-label="Select tool" title="Select (V)"><span class="icon-glyph" aria-hidden="true">↖</span></button>
+    <button class="tool-button active" type="button" data-tool="select" aria-label="Select tool" title="Select and marquee (V)"><span class="icon-glyph" aria-hidden="true">↖</span></button>
     <button id="stickyTool" class="tool-button" type="button" data-tool="sticky" aria-label="Sticky note tool" title="Sticky Note (N)"><span class="icon-glyph" aria-hidden="true">▤</span><span class="tiny-caret" aria-hidden="true">▾</span></button>
     <button id="stickerTool" class="tool-button" type="button" data-tool="sticker" aria-label="Sticker tool" title="Sticker (S)"><span class="icon-glyph" aria-hidden="true">★</span><span class="tiny-caret" aria-hidden="true">▾</span></button>
     <button class="tool-button" type="button" data-tool="text" aria-label="Text tool" title="Text (T)"><span class="icon-glyph" aria-hidden="true">T</span></button>
@@ -1145,7 +1146,7 @@
 <script>
 (() => {
   'use strict';
-  const APP_VERSION = '1.1.1';
+  const APP_VERSION = '1.1.2';
   const WORLD = Object.freeze({ width: 12000, height: 8000 });
   const DB_NAME = 'tackboard-db';
   const DB_VERSION = 1;
@@ -3353,9 +3354,9 @@
           <kbd>Shift + N</kbd><span>Open note-template picker</span>
           <kbd>S / Shift + S</kbd><span>Use the last sticker / open the sticker picker</span>
           <kbd>T / P / C / F</kbd><span>Text / Pen / Connector / Frame tools</span>
-          <kbd>Left-drag empty board</kbd><span>Pan the board</span>
-          <kbd>Shift + left-drag</kbd><span>Marquee-select objects; add Ctrl/Cmd to preserve the existing selection</span>
-          <kbd>Space / middle + drag</kbd><span>Pan from any starting point</span>
+          <kbd>Left-drag empty board</kbd><span>Marquee-select every object touched by the selection rectangle</span>
+          <kbd>Shift/Ctrl/Cmd + left-drag</kbd><span>Add marquee results to the current selection</span>
+          <kbd>Space + drag / middle-drag</kbd><span>Pan the board from any starting point</span>
           <kbd>Ctrl/Cmd + wheel</kbd><span>Zoom at the pointer</span>
           <kbd>Enter</kbd><span>Edit a selected note or label</span>
           <kbd>Esc</kbd><span>Finish editing or cancel an operation</span>
@@ -4307,6 +4308,8 @@
       currentClient: { x: event.clientX - rect.left, y: event.clientY - rect.top }
     };
     els.marquee.style.display = 'block';
+    els.contextToolbar.classList.remove('visible');
+    els.viewport.classList.add('marquee-selecting');
     els.viewport.setPointerCapture?.(event.pointerId);
   }
 
@@ -4548,6 +4551,7 @@
 
   function finishMarquee(action) {
     els.marquee.style.display = 'none';
+    els.viewport.classList.remove('marquee-selecting');
     const rect = els.viewport.getBoundingClientRect();
     const left = Math.min(action.startClient.x, action.currentClient.x) + rect.left;
     const top = Math.min(action.startClient.y, action.currentClient.y) + rect.top;
@@ -4704,6 +4708,7 @@
     }
     $('#temporaryDrawing', els.drawingGroup)?.remove();
     els.marquee.style.display = 'none';
+    els.viewport.classList.remove('marquee-selecting');
     els.framePreview.style.display = 'none';
     els.wirePreview.hidden = true;
     els.wirePreview.setAttribute('d', '');
@@ -4791,8 +4796,7 @@
       return;
     }
     if (ui.tool === 'select') {
-      if (event.shiftKey) startMarquee(event, { additive: event.ctrlKey || event.metaKey });
-      else startPan(event, { clearSelectionOnTap: true });
+      startMarquee(event, { additive: event.shiftKey || event.ctrlKey || event.metaKey });
     }
     else if (ui.tool === 'sticky') createDefaultSticky(ui.pointerWorld);
     else if (ui.tool === 'text') { addText(ui.pointerWorld); setTool('select'); }
