@@ -1,8 +1,26 @@
-# TACKBOARD v1.0.0
+# TACKBOARD v1.1.1
 
 **TACKBOARD — A Simple Visual Thinking Space**
 
-TACKBOARD is a calm, local-first virtual whiteboard for arranging freeform sticky notes, structured Kanban notes, text labels, frames, connectors, and freehand annotations.
+TACKBOARD is a calm, local-first virtual whiteboard for arranging freeform sticky notes, structured Kanban notes, stickers, text labels, frames, connectors, and freehand annotations.
+
+## What changed in v1.1.1
+
+- Left-drag any empty part of the board to pan with the primary mouse button.
+- Hold `Shift` while left-dragging empty board space to draw a selection marquee. Add `Ctrl`/`Cmd` to keep the existing selection while marquee-selecting more objects.
+- `Space + drag` and middle-button drag remain available for panning from any starting point.
+- Added a dedicated **Red X** sticker alongside the green check and red exclamation stickers, bringing the current library to 17 stickers.
+- Retained the complete v1.1.0 sticker system and higher-contrast sticky-note text.
+
+## What changed in v1.1.0
+
+- Added a reusable sticker tool with 16 built-in stickers: thumbs up, thumbs down, green check, red exclamation, yellow question, blue box, four arrows, star, heart, idea, flag, plus, and minus.
+- Click a sticker in the picker and then click anywhere on the board to place it, including over another board object.
+- On desktop, drag a sticker directly from the picker and drop it onto the board.
+- Stickers can be moved, resized, duplicated, copied, pasted, grouped, aligned, layered, connected, searched, imported, exported, and changed after placement.
+- Darkened all non-charcoal sticky-note text and increased the contrast of labels, placeholders, completed checklist items, and empty Kanban values.
+- Updated dark-theme sticky-note paper colors so the darker ink remains easy to read.
+- Preserved the v1.0.1 text-label centering fix.
 
 ## Run it
 
@@ -30,9 +48,11 @@ Then open `http://localhost:8080`.
 
 - Double-click empty board space to create a blank sticky note.
 - Use the Sticky Note tool or `Shift + N` to choose Blank Note or Kanban.
-- Drag a note by its header; select it to reveal resize and connector handles.
-- Double-click a note or press `Enter` while selected to edit.
-- Use `Space + drag` to pan and `Ctrl/Cmd + wheel` to zoom.
+- Use the Sticker tool or `Shift + S` to open the sticker picker. Plain `S` activates the most recently used sticker.
+- Drag a note by its header; stickers and text labels can be dragged from anywhere inside their bounds.
+- Select an object to reveal contextual actions, resize handles, and—where applicable—a connector handle.
+- Double-click a note or press `Enter` while selected to edit. Double-click a sticker or press `Enter` while it is selected to change it.
+- Left-drag empty board space to pan. Hold `Shift` while left-dragging to marquee-select. `Space + drag` or middle-button drag pans from any starting point. Use `Ctrl/Cmd + wheel` to zoom.
 - Use the board switcher to create, rename, duplicate, delete, and search boards.
 - Use Export for current-board JSON, selected-object JSON, complete backups, clean PNGs, and browser-generated PDF/print output. PDF/Print supports the entire board on one page, tiled multi-page output, the visible viewport, or the current selection.
 

@@ -71,18 +71,18 @@
     --shadow-sm: 0 2px 9px rgba(0, 0, 0, .28);
     --shadow-md: 0 18px 40px rgba(0, 0, 0, .34);
     --shadow-note: 0 10px 26px rgba(0, 0, 0, .34), 0 2px 5px rgba(0, 0, 0, .28);
-    --yellow: #b99f4c;
-    --yellow-2: #a88e3c;
-    --blue: #557f91;
-    --blue-2: #4a7181;
-    --green: #5c855c;
-    --green-2: #507850;
-    --coral: #9d6658;
-    --coral-2: #8f594d;
-    --lavender: #77618a;
-    --lavender-2: #685477;
-    --cream: #87795f;
-    --cream-2: #786b53;
+    --yellow: #d8bf60;
+    --yellow-2: #cbae4c;
+    --blue: #86b5c8;
+    --blue-2: #72a6bc;
+    --green: #90bd8f;
+    --green-2: #7cad7b;
+    --coral: #d9907a;
+    --coral-2: #cb7d66;
+    --lavender: #aa8ec0;
+    --lavender-2: #9a7caf;
+    --cream: #caba99;
+    --cream-2: #b9a983;
     --charcoal: #444b50;
     --charcoal-2: #373d42;
   }
@@ -258,13 +258,33 @@
     background: var(--bg);
     outline: none;
   }
-  #viewport[data-tool="select"] { cursor: default; }
+  #viewport[data-tool="select"] { cursor: grab; }
+  #viewport[data-tool="select"] .sticky-note,
+  #viewport[data-tool="select"] .frame-object { cursor: default; }
   #viewport[data-tool="pen"] { cursor: crosshair; }
   #viewport[data-tool="connector"] { cursor: crosshair; }
   #viewport[data-tool="frame"] { cursor: crosshair; }
   #viewport[data-tool="text"] { cursor: text; }
+  #viewport[data-tool="sticker"] { cursor: copy; }
   #viewport[data-tool="eraser"] { cursor: cell; }
   #viewport.panning { cursor: grabbing !important; }
+  #viewport.sticker-drop-target::after {
+    content: "Drop sticker";
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 8600;
+    padding: 10px 15px;
+    border: 2px dashed var(--accent);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    color: var(--accent-strong);
+    box-shadow: var(--shadow-md);
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: .04em;
+    pointer-events: none;
+  }
 
   #world {
     position: absolute;
@@ -370,7 +390,7 @@
     min-height: 130px;
     border-radius: 10px 10px 13px 11px;
     box-shadow: var(--shadow-note);
-    color: #253034;
+    color: #101619;
     background: var(--yellow);
     overflow: visible;
     border: 1px solid rgba(55,57,50,.12);
@@ -387,7 +407,12 @@
   .sticky-note.note-charcoal textarea,
   .sticky-note.note-charcoal select { color: #f5f6f6; }
   .sticky-note.note-charcoal input::placeholder,
-  .sticky-note.note-charcoal textarea::placeholder { color: rgba(255,255,255,.58); }
+  .sticky-note.note-charcoal textarea::placeholder { color: rgba(255,255,255,.80); opacity: 1; }
+  .sticky-note:not(.note-charcoal) input,
+  .sticky-note:not(.note-charcoal) textarea,
+  .sticky-note:not(.note-charcoal) select { color: #101619; }
+  .sticky-note:not(.note-charcoal) input::placeholder,
+  .sticky-note:not(.note-charcoal) textarea::placeholder { color: rgba(16,22,25,.80); opacity: 1; }
 
   .object-header {
     min-height: 38px;
@@ -448,11 +473,11 @@
   }
   .blank-note-title { margin: 0 0 8px; font-size: 17px; line-height: 1.15; font-weight: 850; }
   .blank-note-content { font-size: 14px; line-height: 1.43; white-space: pre-wrap; overflow-wrap: anywhere; }
-  .blank-note-placeholder { opacity: .52; font-style: italic; }
+  .blank-note-placeholder { opacity: .84; font-style: italic; }
   .checklist { display: flex; flex-direction: column; gap: 7px; }
   .check-row { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.32; }
   .check-row input { margin: 2px 0 0; accent-color: var(--accent-strong); }
-  .check-row.done span { text-decoration: line-through; opacity: .62; }
+  .check-row.done span { text-decoration: line-through; opacity: .84; }
 
   .note-edit-grid { height: calc(100% - 38px); display: grid; border-radius: 0 0 11px 11px; overflow: hidden; grid-template-rows: auto auto 1fr; gap: 8px; padding: 10px; }
   .note-edit-grid input,
@@ -528,10 +553,10 @@
     font-weight: 850;
     letter-spacing: .055em;
     text-transform: uppercase;
-    opacity: .62;
+    opacity: 1;
   }
   .kanban-value { font-size: 13px; line-height: 1.32; white-space: pre-wrap; overflow-wrap: anywhere; }
-  .kanban-value.empty { opacity: .46; }
+  .kanban-value.empty { opacity: .78; }
   .kanban-value.description-clamp { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
   .kanban-edit { display: flex; flex-direction: column; gap: 9px; }
   .field-control { display: flex; flex-direction: column; gap: 4px; }
@@ -541,7 +566,7 @@
     font-weight: 850;
     letter-spacing: .055em;
     text-transform: uppercase;
-    opacity: .72;
+    opacity: 1;
   }
   .field-control input,
   .field-control select,
@@ -581,18 +606,51 @@
     font-size: 24px;
     font-weight: 760;
     line-height: 1.2;
-    white-space: pre-wrap;
+    white-space: normal;
     overflow-wrap: anywhere;
     cursor: grab;
   }
+  .text-object:not(.editing) {
+    display: flex;
+    align-items: center;
+  }
+  .text-object > [data-edit-trigger] {
+    width: 100%;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
   .text-object.editing { background: color-mix(in srgb, var(--surface) 88%, transparent); box-shadow: var(--shadow-sm); }
   .text-object textarea {
+    display: block;
     width: 100%; height: 100%; min-height: 42px;
     border: 0; outline: 0; resize: none;
     padding: 2px;
     background: transparent;
     font: inherit; line-height: inherit;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
+
+  .sticker-object {
+    min-width: 44px;
+    min-height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    cursor: grab;
+    touch-action: none;
+    filter: drop-shadow(0 5px 5px rgba(27,31,34,.20)) drop-shadow(0 1px 1px rgba(27,31,34,.18));
+  }
+  [data-theme="dark"] .sticker-object { filter: drop-shadow(0 6px 7px rgba(0,0,0,.36)); }
+  .sticker-object:active { cursor: grabbing; }
+  .sticker-object .sticker-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .sticker-object.selected::after { border-radius: 18px; }
 
   .frame-object {
     min-width: 200px;
@@ -796,6 +854,32 @@
   .board-list-empty { padding: 14px 8px; color: var(--muted); font-size: 12px; text-align: center; }
 
   .palette-grid { display: grid; grid-template-columns: repeat(4, 34px); gap: 7px; padding: 5px; }
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(62px, 1fr));
+    gap: 8px;
+    padding: 4px 5px 7px;
+  }
+  .sticker-choice {
+    min-width: 0;
+    min-height: 82px;
+    display: grid;
+    grid-template-rows: 52px auto;
+    place-items: center;
+    gap: 4px;
+    padding: 7px 5px 6px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: var(--surface-2);
+    color: var(--ink);
+    cursor: grab;
+  }
+  .sticker-choice:hover { background: var(--surface-3); border-color: var(--line-strong); transform: translateY(-1px); }
+  .sticker-choice:active { cursor: grabbing; transform: translateY(0); }
+  .sticker-choice.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+  .sticker-choice .sticker-svg { width: 50px; height: 50px; overflow: visible; pointer-events: none; filter: drop-shadow(0 2px 2px rgba(30,34,36,.18)); }
+  .sticker-choice-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; line-height: 1.2; font-weight: 800; }
+  .sticker-hint { margin: 4px 7px 7px; color: var(--muted); font-size: 10px; line-height: 1.4; }
   .swatch {
     width: 34px; height: 34px;
     border: 2px solid rgba(37,42,46,.15);
@@ -948,7 +1032,7 @@
       <div class="brand-mark" aria-hidden="true">T</div>
       <div class="brand-copy">
         <div class="brand-title">TACKBOARD</div>
-        <div class="brand-meta">v1.0.0 · LOCAL &amp; PRIVATE</div>
+        <div class="brand-meta">v1.1.1 · LOCAL &amp; PRIVATE</div>
       </div>
     </div>
 
@@ -985,6 +1069,7 @@
   <nav id="toolDock" class="tool-dock" aria-label="Whiteboard tools">
     <button class="tool-button active" type="button" data-tool="select" aria-label="Select tool" title="Select (V)"><span class="icon-glyph" aria-hidden="true">↖</span></button>
     <button id="stickyTool" class="tool-button" type="button" data-tool="sticky" aria-label="Sticky note tool" title="Sticky Note (N)"><span class="icon-glyph" aria-hidden="true">▤</span><span class="tiny-caret" aria-hidden="true">▾</span></button>
+    <button id="stickerTool" class="tool-button" type="button" data-tool="sticker" aria-label="Sticker tool" title="Sticker (S)"><span class="icon-glyph" aria-hidden="true">★</span><span class="tiny-caret" aria-hidden="true">▾</span></button>
     <button class="tool-button" type="button" data-tool="text" aria-label="Text tool" title="Text (T)"><span class="icon-glyph" aria-hidden="true">T</span></button>
     <button class="tool-button" type="button" data-tool="pen" aria-label="Pen tool" title="Pen (P)"><span class="icon-glyph" aria-hidden="true">✎</span></button>
     <button class="tool-button" type="button" data-tool="connector" aria-label="Connector tool" title="Connector (C)"><span class="icon-glyph" aria-hidden="true">↗</span></button>
@@ -1021,6 +1106,7 @@
         <div class="empty-actions">
           <button class="button" type="button" data-empty-action="blank">Blank Note</button>
           <button class="button" type="button" data-empty-action="kanban">Kanban Note</button>
+          <button class="button" type="button" data-empty-action="sticker">Sticker</button>
           <button class="button" type="button" data-empty-action="frame">Add Frame</button>
           <button class="button" type="button" data-empty-action="example">Load Example</button>
           <button class="button" type="button" data-empty-action="import">Import Board</button>
@@ -1059,7 +1145,7 @@
 <script>
 (() => {
   'use strict';
-  const APP_VERSION = '1.0.0';
+  const APP_VERSION = '1.1.1';
   const WORLD = Object.freeze({ width: 12000, height: 8000 });
   const DB_NAME = 'tackboard-db';
   const DB_VERSION = 1;
@@ -1073,6 +1159,27 @@
   const TEAM_OPTIONS = ['SPA', 'PIC', 'PPD', 'CPPD', 'FES', 'R&A', 'P&BA', 'CMDSPT', 'HCM', 'SEC', 'EEO'];
   const TICKET_TYPES = ['Story', 'Bug', 'Subtask'];
   const STATUS_OPTIONS = ['Backlog', 'VP Scheduled', 'VP Held', 'Ready', 'In Dev', 'UAT', 'Done'];
+  const STICKER_CATALOG = Object.freeze([
+    { id: 'thumbs-up', label: 'Thumbs Up', width: 92, height: 92, accent: '#4389d6', svg: `<path d="M29 43h16l6-23c1.3-5.5 7.5-8.3 12-5.2 3.1 2.1 4.3 5.9 3.3 9.6L62 40h18c7.1 0 11.9 6.8 9.8 13.5l-7 23.2A11 11 0 0 1 72.3 85H29Z" fill="#4389d6" stroke="#fff" stroke-width="6" stroke-linejoin="round"/><rect x="10" y="42" width="22" height="45" rx="7" fill="#2e6cae" stroke="#fff" stroke-width="6"/>` },
+    { id: 'thumbs-down', label: 'Thumbs Down', width: 92, height: 92, accent: '#e1695d', svg: `<g transform="rotate(180 50 50)"><path d="M29 43h16l6-23c1.3-5.5 7.5-8.3 12-5.2 3.1 2.1 4.3 5.9 3.3 9.6L62 40h18c7.1 0 11.9 6.8 9.8 13.5l-7 23.2A11 11 0 0 1 72.3 85H29Z" fill="#e1695d" stroke="#fff" stroke-width="6" stroke-linejoin="round"/><rect x="10" y="42" width="22" height="45" rx="7" fill="#b74840" stroke="#fff" stroke-width="6"/></g>` },
+    { id: 'check', label: 'Green Check', width: 90, height: 90, accent: '#35a85a', svg: `<circle cx="50" cy="50" r="39" fill="#35a85a" stroke="#fff" stroke-width="6"/><path d="M28 51l14 15 31-33" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>` },
+    { id: 'red-x', label: 'Red X', width: 90, height: 90, accent: '#d94b48', svg: `<circle cx="50" cy="50" r="39" fill="#d94b48" stroke="#fff" stroke-width="6"/><path d="M34 34l32 32M66 34 34 66" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>` },
+    { id: 'exclamation', label: 'Red Exclamation', width: 90, height: 90, accent: '#d94b48', svg: `<circle cx="50" cy="50" r="39" fill="#d94b48" stroke="#fff" stroke-width="6"/><path d="M50 27v31" stroke="#fff" stroke-width="10" stroke-linecap="round"/><circle cx="50" cy="72" r="5.5" fill="#fff"/>` },
+    { id: 'question', label: 'Yellow Question', width: 90, height: 90, accent: '#f0c84d', svg: `<circle cx="50" cy="50" r="39" fill="#f0c84d" stroke="#fff" stroke-width="6"/><text x="50" y="69" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" font-weight="900" fill="#293136">?</text>` },
+    { id: 'blue-box', label: 'Blue Box', width: 88, height: 88, accent: '#3784d4', svg: `<rect x="12" y="12" width="76" height="76" rx="13" fill="#3784d4" stroke="#fff" stroke-width="6"/><rect x="26" y="26" width="48" height="48" rx="6" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="4"/>` },
+    { id: 'arrow-right', label: 'Right Arrow', width: 128, height: 76, accent: '#4d75cf', svg: `<path d="M8 37h46V19l38 31-38 31V63H8Z" fill="#4d75cf" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>` },
+    { id: 'arrow-left', label: 'Left Arrow', width: 128, height: 76, accent: '#4d75cf', svg: `<path d="M92 37H46V19L8 50l38 31V63h46Z" fill="#4d75cf" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>` },
+    { id: 'arrow-up', label: 'Up Arrow', width: 76, height: 128, accent: '#3a9c9a', svg: `<path d="M37 92V46H19L50 8l31 38H63v46Z" fill="#3a9c9a" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>` },
+    { id: 'arrow-down', label: 'Down Arrow', width: 76, height: 128, accent: '#3a9c9a', svg: `<path d="M37 8v46H19l31 38 31-38H63V8Z" fill="#3a9c9a" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>` },
+    { id: 'star', label: 'Star', width: 92, height: 92, accent: '#f0b83f', svg: `<path d="M50 9l12.4 25.1 27.7 4-20 19.5 4.7 27.5L50 72.1 25.2 85.1l4.7-27.5-20-19.5 27.7-4Z" fill="#f0b83f" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>` },
+    { id: 'heart', label: 'Heart', width: 94, height: 88, accent: '#e35c6d', svg: `<path d="M50 84 16 52C-2 35 8 13 28 13c10 0 18 5 22 13 4-8 12-13 22-13 20 0 30 22 12 39Z" fill="#e35c6d" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>` },
+    { id: 'idea', label: 'Idea', width: 88, height: 98, accent: '#f0c84d', svg: `<path d="M50 10c-20 0-34 14-34 33 0 13 7 22 16 29 4 3 6 7 6 12h24c0-5 2-9 6-12 9-7 16-16 16-29 0-19-14-33-34-33Z" fill="#f0c84d" stroke="#fff" stroke-width="6" stroke-linejoin="round"/><path d="M38 85h24M41 94h18" stroke="#65531d" stroke-width="6" stroke-linecap="round"/><path d="M50 27v24M38 39h24" stroke="#fff" stroke-width="6" stroke-linecap="round"/>` },
+    { id: 'flag', label: 'Flag', width: 96, height: 96, accent: '#df554e', svg: `<path d="M25 89V12" stroke="#fff" stroke-width="8" stroke-linecap="round"/><path d="M28 16h54L68 36l14 20H28Z" fill="#df554e" stroke="#fff" stroke-width="6" stroke-linejoin="round"/><circle cx="25" cy="12" r="6" fill="#384247" stroke="#fff" stroke-width="4"/>` },
+    { id: 'plus', label: 'Plus', width: 88, height: 88, accent: '#34a66a', svg: `<circle cx="50" cy="50" r="39" fill="#34a66a" stroke="#fff" stroke-width="6"/><path d="M50 29v42M29 50h42" stroke="#fff" stroke-width="10" stroke-linecap="round"/>` },
+    { id: 'minus', label: 'Minus', width: 88, height: 88, accent: '#db6558', svg: `<circle cx="50" cy="50" r="39" fill="#db6558" stroke="#fff" stroke-width="6"/><path d="M29 50h42" stroke="#fff" stroke-width="10" stroke-linecap="round"/>` }
+  ]);
+  const STICKER_BY_ID = new Map(STICKER_CATALOG.map(sticker => [sticker.id, sticker]));
+  const STICKER_IDS = STICKER_CATALOG.map(sticker => sticker.id);
 
   const KANBAN_SCHEMA = Object.freeze({
     templateId: 'kanban',
@@ -1134,6 +1241,7 @@
     saveStatusText: $('#saveStatusText'),
     toolDock: $('#toolDock'),
     stickyTool: $('#stickyTool'),
+    stickerTool: $('#stickerTool'),
     dockMoreButton: $('#dockMoreButton'),
     contextToolbar: $('#contextToolbar'),
     zoomOut: $('#zoomOut'),
@@ -1221,6 +1329,11 @@
     return formatDate(value);
   }
   function statusClass(value) { return `status-${String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`; }
+  function stickerDefinition(id) { return STICKER_BY_ID.get(id) || STICKER_BY_ID.get('check') || STICKER_CATALOG[0]; }
+  function stickerSVG(id, extraClass = '') {
+    const sticker = stickerDefinition(id);
+    return `<svg class="sticker-svg ${escapeAttr(extraClass)}" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" focusable="false" aria-hidden="true">${sticker.svg}</svg>`;
+  }
   function prefersDark() { return matchMedia('(prefers-color-scheme: dark)').matches; }
   function effectiveTheme() {
     const setting = state?.settings?.theme || 'system';
@@ -1258,6 +1371,7 @@
         defaultBlankColor: 'yellow',
         defaultStructuredColor: 'yellow',
         defaultStickyType: 'blank',
+        defaultStickerId: 'check',
         defaultExportFormat: 'png',
         reducedMotion: false,
         confirmObjectDelete: false,
@@ -1299,7 +1413,8 @@
     usingLocalStorageFallback: false,
     dialogResolver: null,
     lastFocused: null,
-    menuAnchor: null
+    menuAnchor: null,
+    stickerReplaceId: null
   };
 
   function normalizeObject(obj) {
@@ -1345,6 +1460,12 @@
     }
     if (base.objectType === 'text') {
       return { ...base, text: String(obj.text || 'Text'), fontSize: clamp(Number(obj.fontSize) || 24, 12, 96), align: obj.align || 'left', textColor: obj.textColor || '' };
+    }
+    if (base.objectType === 'sticker') {
+      const sticker = stickerDefinition(obj.stickerId);
+      const suppliedWidth = Number.isFinite(Number(obj.width)) ? Number(obj.width) : Number.isFinite(Number(obj.size?.width)) ? Number(obj.size.width) : sticker.width;
+      const suppliedHeight = Number.isFinite(Number(obj.height)) ? Number(obj.height) : Number.isFinite(Number(obj.size?.height)) ? Number(obj.size.height) : sticker.height;
+      return { ...base, width: clamp(suppliedWidth, 44, 900), height: clamp(suppliedHeight, 44, 900), stickerId: sticker.id };
     }
     if (base.objectType === 'frame') {
       return { ...base, title: String(obj.title || 'Frame'), description: String(obj.description || ''), color: FRAME_COLORS.includes(obj.color) ? obj.color : 'neutral', collapsed: Boolean(obj.collapsed) };
@@ -1407,6 +1528,7 @@
     if (!NOTE_COLORS.includes(settings.defaultBlankColor)) settings.defaultBlankColor = 'yellow';
     if (!NOTE_COLORS.includes(settings.defaultStructuredColor)) settings.defaultStructuredColor = 'yellow';
     if (!['blank', 'kanban'].includes(settings.defaultStickyType)) settings.defaultStickyType = 'blank';
+    if (!STICKER_IDS.includes(settings.defaultStickerId)) settings.defaultStickerId = 'check';
     const currentBoardId = boards.some(b => b.id === raw.currentBoardId) ? raw.currentBoardId : boards[0].id;
     return {
       format: 'tackboard-backup',
@@ -1672,6 +1794,24 @@
     });
   }
 
+  function createSticker(point = null, overrides = {}) {
+    const sticker = stickerDefinition(overrides.stickerId || state.settings.defaultStickerId);
+    const width = Number(overrides.width) || sticker.width;
+    const height = Number(overrides.height) || sticker.height;
+    const pos = defaultPlacement(width, height, point);
+    return normalizeObject({
+      id: uuid('sticker'),
+      objectType: 'sticker',
+      stickerId: sticker.id,
+      x: pos.x,
+      y: pos.y,
+      width,
+      height,
+      zIndex: maxZ() + 1,
+      rotation: Number(overrides.rotation) || 0
+    });
+  }
+
   function createFrame(point = null, overrides = {}) {
     const width = Number(overrides.width) || 520;
     const height = Number(overrides.height) || 360;
@@ -1719,6 +1859,12 @@
     return addObject(createTextObject(point, overrides), { edit, historyLabel: 'Create text label' });
   }
 
+  function addSticker(point, overrides = {}) {
+    const sticker = stickerDefinition(overrides.stickerId || state.settings.defaultStickerId);
+    state.settings.defaultStickerId = sticker.id;
+    return addObject(createSticker(point, { ...overrides, stickerId: sticker.id }), { edit: false, historyLabel: 'Add sticker' });
+  }
+
   function addFrame(point, overrides = {}) {
     return addObject(createFrame(point, overrides), { edit: false, historyLabel: 'Create frame' });
   }
@@ -1731,8 +1877,8 @@
 
   function selectionDecorations(obj) {
     if (!ui.selection.has(obj.id) || ui.editingId === obj.id || obj.objectType === 'drawing') return '';
-    const canResize = ['blank-note', 'template-note', 'text', 'frame'].includes(obj.objectType);
-    const canConnect = ['blank-note', 'template-note', 'text', 'frame'].includes(obj.objectType);
+    const canResize = ['blank-note', 'template-note', 'text', 'sticker', 'frame'].includes(obj.objectType);
+    const canConnect = ['blank-note', 'template-note', 'text', 'sticker', 'frame'].includes(obj.objectType);
     return `${canResize ? '<span class="resize-handle e" data-resize="e" aria-hidden="true"></span><span class="resize-handle s" data-resize="s" aria-hidden="true"></span><span class="resize-handle se" data-resize="se" aria-hidden="true"></span>' : ''}${canConnect ? '<span class="connector-handle" data-connector-handle="true" title="Drag to connect" aria-hidden="true"></span>' : ''}`;
   }
 
@@ -1741,6 +1887,7 @@
     if (obj.objectType === 'blank-note' || obj.objectType === 'template-note') classes.push('sticky-note', `note-${obj.color || 'yellow'}`);
     if (obj.objectType === 'template-note') classes.push('kanban-note');
     if (obj.objectType === 'text') classes.push('text-object');
+    if (obj.objectType === 'sticker') classes.push('sticker-object');
     if (obj.objectType === 'frame') classes.push('frame-object', `frame-${obj.color || 'neutral'}`);
     if (ui.selection.has(obj.id)) classes.push('selected');
     if (ui.connectorSourceId === obj.id) classes.push('connector-source');
@@ -1854,6 +2001,14 @@
     </div>`;
   }
 
+  function renderSticker(obj) {
+    const sticker = stickerDefinition(obj.stickerId);
+    return `<div class="${noteViewClasses(obj)}" data-object-id="${obj.id}" data-object-type="sticker" data-drag-handle="true" style="${objectStyle(obj)}" tabindex="0" title="${escapeAttr(sticker.label)}" aria-label="${escapeAttr(sticker.label)} sticker">
+      ${stickerSVG(sticker.id)}
+      ${selectionDecorations(obj)}
+    </div>`;
+  }
+
   function renderFrame(obj) {
     return `<section class="${noteViewClasses(obj)}" data-object-id="${obj.id}" data-object-type="frame" style="${objectStyle(obj)}" tabindex="0" aria-label="Frame: ${escapeAttr(obj.title)}">
       <header class="frame-header" data-drag-handle="true">
@@ -1875,6 +2030,7 @@
       if (obj.objectType === 'blank-note') return renderBlankNote(obj);
       if (obj.objectType === 'template-note') return renderKanbanNote(obj);
       if (obj.objectType === 'text') return renderTextObject(obj);
+      if (obj.objectType === 'sticker') return renderSticker(obj);
       if (obj.objectType === 'frame') return renderFrame(obj);
       return '';
     }).join('');
@@ -1978,6 +2134,7 @@
       return parts.join(' ');
     }
     if (obj.objectType === 'text') return obj.text;
+    if (obj.objectType === 'sticker') { const sticker = stickerDefinition(obj.stickerId); return `${sticker.label} ${sticker.id.replaceAll('-', ' ')}`; }
     if (obj.objectType === 'frame') return `${obj.title} ${obj.description}`;
     return '';
   }
@@ -2303,6 +2460,14 @@
         ctx.strokeRect(obj.x * scaleX, obj.y * scaleY, Math.max(2, obj.width * scaleX), Math.max(2, obj.height * scaleY));
         continue;
       }
+      if (obj.objectType === 'sticker') {
+        ctx.fillStyle = stickerDefinition(obj.stickerId).accent;
+        const size = Math.max(3, Math.min(Math.max(3, obj.width * scaleX), Math.max(3, obj.height * scaleY)));
+        ctx.beginPath();
+        ctx.arc((obj.x + obj.width / 2) * scaleX, (obj.y + obj.height / 2) * scaleY, Math.max(2, size / 2), 0, Math.PI * 2);
+        ctx.fill();
+        continue;
+      }
       ctx.fillStyle = obj.objectType === 'text' ? (dark ? '#dfe4e6' : '#4b5357') : (palette[obj.color] || palette.yellow);
       ctx.fillRect(obj.x * scaleX, obj.y * scaleY, Math.max(2, obj.width * scaleX), Math.max(2, obj.height * scaleY));
     }
@@ -2413,6 +2578,8 @@
       html += `<button type="button" data-action="toggle-compact">${single.displayMode === 'compact' ? 'Expand' : 'Collapse'}</button>`;
     } else if (single && ['blank-note', 'text'].includes(single.objectType)) {
       html += `<button type="button" data-action="edit">Edit</button>`;
+    } else if (single?.objectType === 'sticker') {
+      html += `<button type="button" data-action="change-sticker">Change</button>`;
     } else if (single?.objectType === 'frame') {
       html += `<button type="button" data-action="rename-frame">Rename</button>`;
     } else if (single?.objectType === 'connector') {
@@ -2422,9 +2589,10 @@
       html += `<button type="button" data-action="align-menu">Align</button>`;
       html += `<button type="button" data-action="group-menu">Group</button>`;
     }
-    if (objects.length || connectors.length) html += `<button type="button" data-action="color">Color</button>`;
+    const hasColorable = connectors.length || objects.some(obj => ['blank-note', 'template-note', 'frame', 'drawing'].includes(obj.objectType));
+    if (hasColorable) html += `<button type="button" data-action="color">Color</button>`;
     html += `<button type="button" data-action="duplicate">Duplicate</button>`;
-    if (single && ['blank-note', 'template-note', 'text', 'frame'].includes(single.objectType)) html += `<button type="button" data-action="connect">Connect</button>`;
+    if (single && ['blank-note', 'template-note', 'text', 'sticker', 'frame'].includes(single.objectType)) html += `<button type="button" data-action="connect">Connect</button>`;
     html += `<button type="button" data-action="more">More</button>`;
     els.contextToolbar.innerHTML = html;
     els.contextToolbar.classList.add('visible');
@@ -2711,6 +2879,8 @@
     els.popover.innerHTML = '';
     els.boardButton.setAttribute('aria-expanded', 'false');
     ui.menuAnchor = null;
+    ui.stickerReplaceId = null;
+    els.viewport.classList.remove('sticker-drop-target');
   }
 
   function positionPopover(anchor, { align = 'left', width = null } = {}) {
@@ -2748,10 +2918,42 @@
   function openNotePicker(anchor, worldPoint = null) {
     ui.pointerWorld = worldPoint || ui.pointerWorld;
     openPopover(`
-      <div class="popover-section"><h3>Create sticky note</h3>
+      <div class="popover-section"><h3>Create</h3>
         ${menuItem('new-blank', '▤', 'Blank Note', 'Freeform text, optional tag, or checklist')}
         ${menuItem('new-kanban', '▦', 'Kanban', 'Structured ticket fields and compact view')}
+        ${menuItem('open-stickers', '★', 'Sticker', 'Reactions, markers, arrows, and symbols')}
       </div>`, anchor, { width: 300 });
+  }
+
+  function openStickerPicker(anchor, worldPoint = null, { replaceId = null } = {}) {
+    ui.pointerWorld = worldPoint || ui.pointerWorld;
+    ui.stickerReplaceId = replaceId;
+    const selectedId = replaceId ? getObject(replaceId)?.stickerId : state.settings.defaultStickerId;
+    openPopover(`<div class="popover-section"><h3>${replaceId ? 'Change sticker' : 'Choose sticker'}</h3>
+      <div class="sticker-grid">${STICKER_CATALOG.map(sticker => `<button class="sticker-choice ${selectedId === sticker.id ? 'selected' : ''}" type="button" draggable="true" data-sticker-choice="${escapeAttr(sticker.id)}" aria-label="${escapeAttr(sticker.label)}" title="${escapeAttr(sticker.label)} — click to choose or drag onto the board">${stickerSVG(sticker.id)}<span class="sticker-choice-label">${escapeHTML(sticker.label)}</span></button>`).join('')}</div>
+      <p class="sticker-hint">Click a sticker, then click the board to place it. On desktop, you can also drag a sticker directly onto the board.</p>
+    </div>`, anchor, { width: 360 });
+  }
+
+  function chooseSticker(stickerId) {
+    if (!STICKER_IDS.includes(stickerId)) return;
+    const replaceId = ui.stickerReplaceId;
+    state.settings.defaultStickerId = stickerId;
+    if (replaceId) {
+      const obj = getObject(replaceId);
+      if (!obj || obj.objectType !== 'sticker') { closePopover(); return; }
+      pushHistory('Change sticker');
+      obj.stickerId = stickerId;
+      obj.modifiedAt = nowISO();
+      closePopover();
+      touchBoard();
+      renderAll();
+      toast(`Changed to ${stickerDefinition(stickerId).label}.`, 'success');
+      return;
+    }
+    setTool('sticker');
+    scheduleSave();
+    toast(`${stickerDefinition(stickerId).label} selected. Click the board to place it.`);
   }
 
   function openColorPalette(anchor) {
@@ -2798,6 +3000,7 @@
       specific += menuItem('convert-kanban', '▤', 'Convert to Blank Note', 'Preserve values as readable text');
     }
     if (single?.objectType === 'text') specific += menuItem('text-options', 'T', 'Text Options', 'Size and alignment');
+    if (single?.objectType === 'sticker') specific += menuItem('change-sticker', '★', 'Change Sticker', 'Choose another reaction or symbol');
     if (single?.objectType === 'connector') specific += menuItem('edit-connector', '↗', 'Connector Options');
     openPopover(`<div class="popover-section">${specific || ''}
       ${menuItem('bring-forward', '↑', 'Bring Forward')}
@@ -2869,7 +3072,7 @@
     const f = ui.filters;
     openPopover(`<div class="popover-section"><h3>Kanban filters</h3>
       <form id="filterForm" class="filter-form">
-        <div class="form-row"><label for="filterTemplate">Template</label><select id="filterTemplate" name="template"><option value="" ${!f.template ? 'selected' : ''}>Any object</option><option value="template-note" ${f.template === 'template-note' ? 'selected' : ''}>Kanban</option><option value="blank-note" ${f.template === 'blank-note' ? 'selected' : ''}>Blank notes</option><option value="text" ${f.template === 'text' ? 'selected' : ''}>Text labels</option><option value="frame" ${f.template === 'frame' ? 'selected' : ''}>Frames</option></select></div>
+        <div class="form-row"><label for="filterTemplate">Template</label><select id="filterTemplate" name="template"><option value="" ${!f.template ? 'selected' : ''}>Any object</option><option value="template-note" ${f.template === 'template-note' ? 'selected' : ''}>Kanban</option><option value="blank-note" ${f.template === 'blank-note' ? 'selected' : ''}>Blank notes</option><option value="text" ${f.template === 'text' ? 'selected' : ''}>Text labels</option><option value="sticker" ${f.template === 'sticker' ? 'selected' : ''}>Stickers</option><option value="frame" ${f.template === 'frame' ? 'selected' : ''}>Frames</option></select></div>
         <div class="form-row"><label for="filterTicketType">Ticket Type</label><select id="filterTicketType" name="ticketType">${filterOptions(TICKET_TYPES, f.ticketType)}</select></div>
         <div class="form-row"><label for="filterTeam">Team</label><select id="filterTeam" name="team">${filterOptions(TEAM_OPTIONS, f.team)}</select></div>
         <div class="form-row"><label for="filterStatus">Status</label><select id="filterStatus" name="status">${filterOptions(STATUS_OPTIONS, f.status)}</select></div>
@@ -3030,7 +3233,7 @@
 
   function makeExampleBoard() {
     const board = makeDefaultBoard('TACKBOARD Example');
-    board.description = 'A small example showing blank notes, a Kanban ticket, a frame, drawing, and connectors.';
+    board.description = 'A small example showing blank notes, a Kanban ticket, stickers, a frame, drawing, and connectors.';
     board.background = 'dots';
     board.viewport = { x: 40, y: 70, zoom: .9 };
     const frame = createFrame({ x: 900, y: 560 }, { width: 1100, height: 620, title: 'Release Planning', description: 'Arrange, connect, and refine the work for the next release.', color: 'blue' });
@@ -3046,7 +3249,11 @@
     const label = createTextObject({ x: 910, y: 950 }, { width: 440, height: 64, text: 'CREATE → ARRANGE → CONNECT → REFINE → SAVE', fontSize: 22 });
     label.x = 560; label.y = 805; label.zIndex = 5;
     const drawing = normalizeObject({ id: uuid('drawing'), objectType: 'drawing', points: [{x:740,y:700},{x:780,y:670},{x:830,y:690},{x:870,y:650},{x:930,y:675}], stroke: '#3d6f73', strokeWidth: 4, zIndex: 1 });
-    board.objects = [frame, welcome, ideas, ticket, label, drawing];
+    const checkSticker = createSticker({ x: 1090, y: 700 }, { stickerId: 'check', width: 72, height: 72 });
+    checkSticker.x = 1015; checkSticker.y = 670; checkSticker.zIndex = 6;
+    const arrowSticker = createSticker({ x: 1130, y: 720 }, { stickerId: 'arrow-right', width: 118, height: 70 });
+    arrowSticker.x = 1030; arrowSticker.y = 735; arrowSticker.zIndex = 7;
+    board.objects = [frame, welcome, ideas, ticket, label, drawing, checkSticker, arrowSticker];
     board.connectors = [
       normalizeConnector({ id: uuid('connector'), fromId: welcome.id, toId: ideas.id, style: 'curved', arrow: true, stroke: '#4c555a', strokeWidth: 2, label: 'then' }),
       normalizeConnector({ id: uuid('connector'), fromId: ideas.id, toId: ticket.id, style: 'curved', arrow: true, stroke: '#3d6f73', strokeWidth: 2, label: 'creates' })
@@ -3144,8 +3351,11 @@
           <kbd>V</kbd><span>Select tool</span>
           <kbd>N</kbd><span>Create the default sticky note</span>
           <kbd>Shift + N</kbd><span>Open note-template picker</span>
+          <kbd>S / Shift + S</kbd><span>Use the last sticker / open the sticker picker</span>
           <kbd>T / P / C / F</kbd><span>Text / Pen / Connector / Frame tools</span>
-          <kbd>Space + drag</kbd><span>Pan the board</span>
+          <kbd>Left-drag empty board</kbd><span>Pan the board</span>
+          <kbd>Shift + left-drag</kbd><span>Marquee-select objects; add Ctrl/Cmd to preserve the existing selection</span>
+          <kbd>Space / middle + drag</kbd><span>Pan from any starting point</span>
           <kbd>Ctrl/Cmd + wheel</kbd><span>Zoom at the pointer</span>
           <kbd>Enter</kbd><span>Edit a selected note or label</span>
           <kbd>Esc</kbd><span>Finish editing or cancel an operation</span>
@@ -3377,7 +3587,7 @@
       ink: dark ? '#edf1f2' : '#283034',
       muted: dark ? '#b1b9bd' : '#687176',
       notes: dark ? {
-        yellow: '#b99f4c', blue: '#557f91', green: '#5c855c', coral: '#9d6658', lavender: '#77618a', cream: '#87795f', charcoal: '#41484d'
+        yellow: '#d8bf60', blue: '#86b5c8', green: '#90bd8f', coral: '#d9907a', lavender: '#aa8ec0', cream: '#caba99', charcoal: '#41484d'
       } : {
         yellow: '#f5df83', blue: '#bddbe8', green: '#beddbd', coral: '#efb9a7', lavender: '#d8c6e6', cream: '#efe5cf', charcoal: '#41484d'
       }
@@ -3589,7 +3799,7 @@
     ctx.restore();
   }
 
-  function noteTextColor(obj) { return obj.color === 'charcoal' ? '#f4f6f7' : '#253034'; }
+  function noteTextColor(obj) { return obj.color === 'charcoal' ? '#f4f6f7' : '#101619'; }
 
   function drawNotePaper(ctx, obj, palette, headerHeight) {
     const fill = palette.notes[obj.color] || palette.notes.yellow;
@@ -3645,12 +3855,12 @@
         const lines = obj.content.split(/\r?\n/).filter(line => line.trim());
         for (let i = 0; i < lines.length && y < obj.y + obj.height - 20; i++) {
           ctx.strokeStyle = ink;
-          ctx.globalAlpha = .72;
+          ctx.globalAlpha = .84;
           ctx.strokeRect(obj.x + 15, y + 1, 12, 12);
           if (obj.checkedItems[i]) {
             ctx.beginPath(); ctx.moveTo(obj.x + 17, y + 7); ctx.lineTo(obj.x + 21, y + 11); ctx.lineTo(obj.x + 26, y + 3); ctx.stroke();
           }
-          ctx.globalAlpha = obj.checkedItems[i] ? .55 : 1;
+          ctx.globalAlpha = obj.checkedItems[i] ? .78 : 1;
           drawClampedText(ctx, lines[i], obj.x + 35, y, obj.width - 50, 18, 2);
           ctx.globalAlpha = 1;
           y += 25;
@@ -3662,7 +3872,7 @@
     });
   }
 
-  function drawCanvasBadge(ctx, text, x, y, maxWidth, fill = 'rgba(255,255,255,.25)', ink = '#253034') {
+  function drawCanvasBadge(ctx, text, x, y, maxWidth, fill = 'rgba(255,255,255,.25)', ink = '#101619') {
     ctx.save();
     ctx.font = '800 9px Inter, Arial, sans-serif';
     const width = Math.min(maxWidth, ctx.measureText(text).width + 14);
@@ -3709,11 +3919,11 @@
         if (y > bottom - 24) break;
         const display = kanbanDisplayValue(field, f[field.key]) || '—';
         ctx.fillStyle = ink;
-        ctx.globalAlpha = .62;
+        ctx.globalAlpha = 1;
         ctx.font = '800 9px Inter, Arial, sans-serif';
         ctx.textBaseline = 'top';
         ctx.fillText(field.label.toUpperCase(), obj.x + 13, y, obj.width - 26);
-        ctx.globalAlpha = display === '—' ? .48 : 1;
+        ctx.globalAlpha = display === '—' ? .78 : 1;
         ctx.font = '13px Avenir, Arial, sans-serif';
         const maxLines = field.key === 'description' ? Math.max(2, Math.min(5, Math.floor((bottom - y - 14) / 17))) : 2;
         const nextY = drawClampedText(ctx, display, obj.x + 13, y + 13, obj.width - 26, 17, maxLines);
@@ -3722,6 +3932,86 @@
       }
       ctx.restore();
     });
+  }
+
+  function fillStickerPath(ctx, data, fill, stroke = '#fff', lineWidth = 6) {
+    const path = new Path2D(data);
+    ctx.fillStyle = fill;
+    ctx.fill(path);
+    if (stroke && lineWidth > 0) {
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = lineWidth;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.stroke(path);
+    }
+  }
+
+  function drawStickerGlyph(ctx, stickerId) {
+    const thumbPath = 'M29 43h16l6-23c1.3-5.5 7.5-8.3 12-5.2 3.1 2.1 4.3 5.9 3.3 9.6L62 40h18c7.1 0 11.9 6.8 9.8 13.5l-7 23.2A11 11 0 0 1 72.3 85H29Z';
+    if (stickerId === 'thumbs-up' || stickerId === 'thumbs-down') {
+      ctx.save();
+      if (stickerId === 'thumbs-down') { ctx.translate(100, 100); ctx.rotate(Math.PI); }
+      fillStickerPath(ctx, thumbPath, stickerId === 'thumbs-up' ? '#4389d6' : '#e1695d');
+      ctx.fillStyle = stickerId === 'thumbs-up' ? '#2e6cae' : '#b74840';
+      canvasRoundRect(ctx, 10, 42, 22, 45, 7); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 6; ctx.stroke();
+      ctx.restore();
+      return;
+    }
+    if (stickerId === 'check' || stickerId === 'red-x' || stickerId === 'exclamation' || stickerId === 'question' || stickerId === 'plus' || stickerId === 'minus') {
+      const fills = { check: '#35a85a', 'red-x': '#d94b48', exclamation: '#d94b48', question: '#f0c84d', plus: '#34a66a', minus: '#db6558' };
+      ctx.fillStyle = fills[stickerId]; ctx.beginPath(); ctx.arc(50, 50, 39, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 6; ctx.stroke();
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      if (stickerId === 'check') { ctx.strokeStyle = '#fff'; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(28,51); ctx.lineTo(42,66); ctx.lineTo(73,33); ctx.stroke(); }
+      else if (stickerId === 'red-x') { ctx.strokeStyle = '#fff'; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(34,34); ctx.lineTo(66,66); ctx.moveTo(66,34); ctx.lineTo(34,66); ctx.stroke(); }
+      else if (stickerId === 'exclamation') { ctx.strokeStyle = '#fff'; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(50,27); ctx.lineTo(50,58); ctx.stroke(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(50,72,5.5,0,Math.PI*2); ctx.fill(); }
+      else if (stickerId === 'question') { ctx.fillStyle = '#293136'; ctx.font = '900 56px Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('?', 50, 54); }
+      else if (stickerId === 'plus') { ctx.strokeStyle = '#fff'; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(50,29); ctx.lineTo(50,71); ctx.moveTo(29,50); ctx.lineTo(71,50); ctx.stroke(); }
+      else { ctx.strokeStyle = '#fff'; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(29,50); ctx.lineTo(71,50); ctx.stroke(); }
+      return;
+    }
+    if (stickerId === 'blue-box') {
+      ctx.fillStyle = '#3784d4'; canvasRoundRect(ctx, 12,12,76,76,13); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 6; ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.6)'; ctx.lineWidth = 4; canvasRoundRect(ctx,26,26,48,48,6); ctx.stroke(); return;
+    }
+    if (stickerId.startsWith('arrow-')) {
+      const paths = {
+        'arrow-right': 'M8 37h46V19l38 31-38 31V63H8Z',
+        'arrow-left': 'M92 37H46V19L8 50l38 31V63h46Z',
+        'arrow-up': 'M37 92V46H19L50 8l31 38H63v46Z',
+        'arrow-down': 'M37 8v46H19l31 38 31-38H63V8Z'
+      };
+      fillStickerPath(ctx, paths[stickerId], stickerId === 'arrow-right' || stickerId === 'arrow-left' ? '#4d75cf' : '#3a9c9a'); return;
+    }
+    if (stickerId === 'star') { fillStickerPath(ctx, 'M50 9l12.4 25.1 27.7 4-20 19.5 4.7 27.5L50 72.1 25.2 85.1l4.7-27.5-20-19.5 27.7-4Z', '#f0b83f'); return; }
+    if (stickerId === 'heart') { fillStickerPath(ctx, 'M50 84 16 52C-2 35 8 13 28 13c10 0 18 5 22 13 4-8 12-13 22-13 20 0 30 22 12 39Z', '#e35c6d'); return; }
+    if (stickerId === 'idea') {
+      fillStickerPath(ctx, 'M50 10c-20 0-34 14-34 33 0 13 7 22 16 29 4 3 6 7 6 12h24c0-5 2-9 6-12 9-7 16-16 16-29 0-19-14-33-34-33Z', '#f0c84d');
+      ctx.strokeStyle = '#65531d'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(38,85); ctx.lineTo(62,85); ctx.moveTo(41,94); ctx.lineTo(59,94); ctx.stroke();
+      ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.moveTo(50,27); ctx.lineTo(50,51); ctx.moveTo(38,39); ctx.lineTo(62,39); ctx.stroke(); return;
+    }
+    if (stickerId === 'flag') {
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(25,89); ctx.lineTo(25,12); ctx.stroke();
+      fillStickerPath(ctx, 'M28 16h54L68 36l14 20H28Z', '#df554e');
+      ctx.fillStyle = '#384247'; ctx.beginPath(); ctx.arc(25,12,6,0,Math.PI*2); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.stroke(); return;
+    }
+    drawStickerGlyph(ctx, 'check');
+  }
+
+  function drawStickerExport(ctx, obj) {
+    const sticker = stickerDefinition(obj.stickerId);
+    ctx.save();
+    ctx.translate(obj.x + obj.width / 2, obj.y + obj.height / 2);
+    ctx.rotate((Number(obj.rotation) || 0) * Math.PI / 180);
+    ctx.translate(-obj.width / 2, -obj.height / 2);
+    const scale = Math.min(obj.width / 100, obj.height / 100);
+    ctx.translate((obj.width - 100 * scale) / 2, (obj.height - 100 * scale) / 2);
+    ctx.scale(scale, scale);
+    ctx.shadowColor = effectiveTheme() === 'dark' ? 'rgba(0,0,0,.38)' : 'rgba(28,32,34,.22)';
+    ctx.shadowBlur = 7;
+    ctx.shadowOffsetY = 4;
+    drawStickerGlyph(ctx, sticker.id);
+    ctx.restore();
   }
 
   function drawTextExport(ctx, obj, palette) {
@@ -3770,6 +4060,7 @@
       if (obj.objectType === 'blank-note') drawBlankNoteExport(ctx, obj, palette);
       else if (obj.objectType === 'template-note') drawKanbanNoteExport(ctx, obj, palette);
       else if (obj.objectType === 'text') drawTextExport(ctx, obj, palette);
+      else if (obj.objectType === 'sticker') drawStickerExport(ctx, obj);
     });
     return { canvas, bounds, scale };
   }
@@ -3871,7 +4162,7 @@
   }
 
   function setTool(tool) {
-    if (!['select', 'sticky', 'text', 'pen', 'connector', 'frame', 'eraser'].includes(tool)) return;
+    if (!['select', 'sticky', 'sticker', 'text', 'pen', 'connector', 'frame', 'eraser'].includes(tool)) return;
     if (ui.editingId && tool !== 'select') finishEditing({ render: false });
     if (ui.tool === 'connector' && tool !== 'connector') {
       ui.connectorSourceId = null;
@@ -3944,13 +4235,15 @@
     action.historyPushed = true;
   }
 
-  function startPan(event) {
+  function startPan(event, { clearSelectionOnTap = false } = {}) {
     finishEditing({ render: false });
     closePopover();
     ui.action = {
       type: 'pan', pointerId: event.pointerId,
       startClient: { x: event.clientX, y: event.clientY },
-      startViewport: deepClone(currentBoard().viewport)
+      startViewport: deepClone(currentBoard().viewport),
+      clearSelectionOnTap,
+      moved: false
     };
     els.viewport.classList.add('panning');
     els.viewport.setPointerCapture?.(event.pointerId);
@@ -3988,6 +4281,7 @@
     if (obj.objectType === 'blank-note') return { width: 180, height: 130 };
     if (obj.objectType === 'frame') return { width: 200, height: 120 };
     if (obj.objectType === 'text') return { width: 80, height: 36 };
+    if (obj.objectType === 'sticker') return { width: 44, height: 44 };
     return { width: 40, height: 40 };
   }
 
@@ -4004,11 +4298,11 @@
     els.viewport.setPointerCapture?.(event.pointerId);
   }
 
-  function startMarquee(event) {
+  function startMarquee(event, { additive = false } = {}) {
     const rect = els.viewport.getBoundingClientRect();
     ui.action = {
       type: 'marquee', pointerId: event.pointerId,
-      additive: event.shiftKey,
+      additive,
       startClient: { x: event.clientX - rect.left, y: event.clientY - rect.top },
       currentClient: { x: event.clientX - rect.left, y: event.clientY - rect.top }
     };
@@ -4067,7 +4361,7 @@
 
   function handleConnectorClick(id) {
     const obj = getObject(id);
-    if (!obj || !['blank-note', 'template-note', 'text', 'frame'].includes(obj.objectType)) return;
+    if (!obj || !['blank-note', 'template-note', 'text', 'sticker', 'frame'].includes(obj.objectType)) return;
     if (!ui.connectorSourceId) {
       ui.connectorSourceId = id;
       ui.selection.clear();
@@ -4338,6 +4632,8 @@
     if (action.type === 'pan') {
       const dx = event.clientX - action.startClient.x;
       const dy = event.clientY - action.startClient.y;
+      if (!action.moved && Math.hypot(dx, dy) < 3) return;
+      action.moved = true;
       setViewport({ x: action.startViewport.x + dx, y: action.startViewport.y + dy }, { save: false });
     } else if (action.type === 'drag') updateDragAction(action, event);
     else if (action.type === 'resize') updateResizeAction(action, event);
@@ -4367,7 +4663,12 @@
     hideGuides();
     els.viewport.classList.remove('panning');
     try { els.viewport.releasePointerCapture?.(event.pointerId); } catch {}
-    if (action.type === 'pan') scheduleSave();
+    if (action.type === 'pan') {
+      if (action.clearSelectionOnTap && !action.moved) {
+        ui.selection.clear();
+        renderAll();
+      } else if (action.moved) scheduleSave();
+    }
     else if (action.type === 'drag' || action.type === 'resize') {
       if (action.historyPushed) {
         action.ids?.forEach(id => { const obj = getObject(id); if (obj) obj.modifiedAt = nowISO(); });
@@ -4423,6 +4724,19 @@
       if (beginPinchIfReady()) { event.preventDefault(); return; }
     }
 
+    if (ui.spaceDown || event.button === 1) {
+      startPan(event);
+      event.preventDefault();
+      return;
+    }
+
+    if (ui.tool === 'sticker' && event.button === 0) {
+      addSticker(ui.pointerWorld, { stickerId: state.settings.defaultStickerId });
+      setTool('select');
+      event.preventDefault();
+      return;
+    }
+
     const objectEl = event.target.closest?.('[data-object-id]');
     const drawingPath = event.target.closest?.('[data-drawing-id]');
     const connectorPath = event.target.closest?.('[data-connector-id]');
@@ -4476,8 +4790,10 @@
       event.preventDefault();
       return;
     }
-    if (ui.spaceDown || event.button === 1) { startPan(event); event.preventDefault(); return; }
-    if (ui.tool === 'select') startMarquee(event);
+    if (ui.tool === 'select') {
+      if (event.shiftKey) startMarquee(event, { additive: event.ctrlKey || event.metaKey });
+      else startPan(event, { clearSelectionOnTap: true });
+    }
     else if (ui.tool === 'sticky') createDefaultSticky(ui.pointerWorld);
     else if (ui.tool === 'text') { addText(ui.pointerWorld); setTool('select'); }
     else if (ui.tool === 'pen') startDrawing(event);
@@ -4491,7 +4807,8 @@
     const objectEl = event.target.closest?.('[data-object-id]');
     if (objectEl) {
       const obj = getObject(objectEl.dataset.objectId);
-      if (obj?.objectType === 'frame') renameFrame();
+      if (obj?.objectType === 'sticker') openStickerPicker({ clientX: event.clientX, clientY: event.clientY }, null, { replaceId: obj.id });
+      else if (obj?.objectType === 'frame') renameFrame();
       else if (obj && ['blank-note', 'template-note', 'text'].includes(obj.objectType)) enterEdit(obj.id);
       event.preventDefault();
       return;
@@ -4627,6 +4944,7 @@
   async function handleContextAction(action, anchor) {
     if (action === 'edit') enterEdit(selectedIds()[0]);
     else if (action === 'toggle-compact') toggleKanbanCompact();
+    else if (action === 'change-sticker') openStickerPicker(anchor, null, { replaceId: selectedObjects()[0]?.id });
     else if (action === 'rename-frame') renameFrame();
     else if (action === 'edit-connector') editConnector();
     else if (action === 'align-menu') openAlignMenu(anchor);
@@ -4649,6 +4967,7 @@
     if (!action) return;
     if (action === 'new-blank') { closePopover(); addBlankNote(ui.pointerWorld, { edit: true }); setTool('select'); }
     else if (action === 'new-kanban') { closePopover(); addKanbanNote(ui.pointerWorld, { edit: true }); setTool('select'); }
+    else if (action === 'open-stickers') { const anchor = ui.menuAnchor || source; openStickerPicker(anchor, ui.pointerWorld); }
     else if (action === 'new-board') createBoard();
     else if (action === 'rename-board') renameCurrentBoard();
     else if (action === 'duplicate-board') duplicateCurrentBoard();
@@ -4679,6 +4998,7 @@
     else if (action === 'clear-kanban') { closePopover(); clearKanbanValues(); }
     else if (action === 'convert-kanban') { closePopover(); convertKanbanToBlank(); }
     else if (action === 'text-options') openTextOptions();
+    else if (action === 'change-sticker') { const anchor = ui.menuAnchor || source; openStickerPicker(anchor, null, { replaceId: selectedObjects()[0]?.id }); }
     else if (action === 'edit-connector') { closePopover(); editConnector(); }
     else if (action === 'bring-forward') { closePopover(); layerSelection('forward'); }
     else if (action === 'send-backward') { closePopover(); layerSelection('backward'); }
@@ -4691,6 +5011,8 @@
   function handlePopoverClick(event) {
     const switchButton = event.target.closest('[data-switch-board]');
     if (switchButton) { switchBoard(switchButton.dataset.switchBoard); return; }
+    const stickerChoice = event.target.closest('[data-sticker-choice]');
+    if (stickerChoice) { chooseSticker(stickerChoice.dataset.stickerChoice); return; }
     const objectColor = event.target.closest('[data-object-color]');
     if (objectColor) { applySelectedObjectColor(objectColor.dataset.objectColor); return; }
     const lineColor = event.target.closest('[data-line-color]');
@@ -4803,7 +5125,13 @@
       return;
     }
     if (event.key === 'Delete' || event.key === 'Backspace') { if (selectedIds().length) { event.preventDefault(); deleteSelection(); } return; }
-    if (event.key === 'Enter' && selectedIds().length === 1) { event.preventDefault(); enterEdit(selectedIds()[0]); return; }
+    if (event.key === 'Enter' && selectedIds().length === 1) {
+      event.preventDefault();
+      const selected = getSelectable(selectedIds()[0]);
+      if (selected?.objectType === 'sticker') openStickerPicker(els.stickerTool, null, { replaceId: selected.id });
+      else enterEdit(selectedIds()[0]);
+      return;
+    }
     if (event.key === '0') { event.preventDefault(); resetView(); return; }
     if (event.key === '1') { event.preventDefault(); fitContent(); return; }
 
@@ -4811,6 +5139,8 @@
     if (key === 'v') setTool('select');
     else if (key === 'n' && event.shiftKey) { event.preventDefault(); openNotePicker(els.stickyTool, screenToWorld(els.viewport.getBoundingClientRect().left + els.viewport.clientWidth / 2, els.viewport.getBoundingClientRect().top + els.viewport.clientHeight / 2)); }
     else if (key === 'n') { event.preventDefault(); createDefaultSticky(screenToWorld(els.viewport.getBoundingClientRect().left + els.viewport.clientWidth / 2, els.viewport.getBoundingClientRect().top + els.viewport.clientHeight / 2)); }
+    else if (key === 's' && event.shiftKey) { event.preventDefault(); openStickerPicker(els.stickerTool, screenToWorld(els.viewport.getBoundingClientRect().left + els.viewport.clientWidth / 2, els.viewport.getBoundingClientRect().top + els.viewport.clientHeight / 2)); }
+    else if (key === 's') { event.preventDefault(); setTool('sticker'); }
     else if (key === 't') setTool('text');
     else if (key === 'p') setTool('pen');
     else if (key === 'c') setTool('connector');
@@ -4841,6 +5171,9 @@
       if (tool === 'sticky' && (event.target.closest('.tiny-caret') || ui.tool === 'sticky')) {
         const center = screenToWorld(els.viewport.getBoundingClientRect().left + els.viewport.clientWidth / 2, els.viewport.getBoundingClientRect().top + els.viewport.clientHeight / 2);
         openNotePicker(button, center);
+      } else if (tool === 'sticker') {
+        const center = screenToWorld(els.viewport.getBoundingClientRect().left + els.viewport.clientWidth / 2, els.viewport.getBoundingClientRect().top + els.viewport.clientHeight / 2);
+        openStickerPicker(button, center);
       } else setTool(tool);
     });
     els.dockMoreButton.addEventListener('click', () => openDrawingOptions(els.dockMoreButton));
@@ -4887,18 +5220,48 @@
       const center = screenToWorld(els.viewport.getBoundingClientRect().left + els.viewport.clientWidth / 2, els.viewport.getBoundingClientRect().top + els.viewport.clientHeight / 2);
       if (action === 'blank') addBlankNote(center, { edit: true });
       if (action === 'kanban') addKanbanNote(center, { edit: true });
+      if (action === 'sticker') openStickerPicker(event.target.closest('[data-empty-action]'), center);
       if (action === 'frame') addFrame(center);
       if (action === 'example') loadExampleBoard();
       if (action === 'import') els.importInput.click();
     });
 
     els.popover.addEventListener('click', handlePopoverClick);
+    els.popover.addEventListener('dragstart', event => {
+      const choice = event.target.closest('[data-sticker-choice]');
+      if (!choice || !event.dataTransfer) return;
+      const stickerId = choice.dataset.stickerChoice;
+      state.settings.defaultStickerId = stickerId;
+      event.dataTransfer.effectAllowed = 'copy';
+      event.dataTransfer.setData('application/x-tackboard-sticker', stickerId);
+      event.dataTransfer.setData('text/plain', stickerId);
+      els.viewport.classList.add('sticker-drop-target');
+    });
+    els.popover.addEventListener('dragend', () => els.viewport.classList.remove('sticker-drop-target'));
+    els.viewport.addEventListener('dragover', event => {
+      if (!Array.from(event.dataTransfer?.types || []).includes('application/x-tackboard-sticker')) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'copy';
+      els.viewport.classList.add('sticker-drop-target');
+    });
+    els.viewport.addEventListener('drop', event => {
+      const stickerId = event.dataTransfer?.getData('application/x-tackboard-sticker');
+      if (!STICKER_IDS.includes(stickerId)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      ui.pointerWorld = screenToWorld(event.clientX, event.clientY);
+      state.settings.defaultStickerId = stickerId;
+      addSticker(ui.pointerWorld, { stickerId });
+      closePopover();
+      setTool('select');
+      els.viewport.classList.remove('sticker-drop-target');
+    });
     els.popover.addEventListener('input', handlePopoverInput);
     els.popover.addEventListener('change', handlePopoverInput);
     els.popover.addEventListener('submit', handleFilterSubmit);
 
     document.addEventListener('pointerdown', event => {
-      if (!els.popover.classList.contains('hidden') && !event.target.closest('#popover') && !event.target.closest('#boardButton,#filterButton,#exportButton,#settingsButton,#stickyTool,#dockMoreButton,#contextToolbar')) closePopover();
+      if (!els.popover.classList.contains('hidden') && !event.target.closest('#popover') && !event.target.closest('#boardButton,#filterButton,#exportButton,#settingsButton,#stickyTool,#stickerTool,#dockMoreButton,#contextToolbar')) closePopover();
     }, true);
 
     els.dialogFooter.addEventListener('click', event => {
@@ -4957,6 +5320,7 @@
       getCurrentBoard: () => deepClone(currentBoard()),
       addBlankNote: point => addBlankNote(point || { x: 500, y: 400 }, { edit: false }),
       addKanbanNote: point => addKanbanNote(point || { x: 700, y: 400 }, { edit: false }),
+      addSticker: (stickerId = 'check', point = null) => addSticker(point || { x: 900, y: 400 }, { stickerId }),
       loadExampleBoard,
       saveNow,
       renderAll
