@@ -24,7 +24,7 @@
         return;
       }
       if (event.target.closest('[data-reset-filter-bar]')) {
-        ui.filters = { template: '', ticketType: '', team: '', status: '', needsVP: '', due: '', from: '', to: '' };
+        ui.filters = { template: '', ticketType: '', team: '', status: '', onHold: '', needsVP: '', due: '', from: '', to: '' };
         renderAll();
       }
     });

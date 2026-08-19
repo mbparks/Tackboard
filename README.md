@@ -1,14 +1,20 @@
-# TACKBOARD v1.2.1
+# TACKBOARD v1.2.2
 
 **TACKBOARD — A Simple Visual Thinking Space**
 
 TACKBOARD is a calm, local-first virtual whiteboard for arranging freeform sticky notes, structured Kanban notes, stickers, text labels, frames, connectors, and freehand annotations. It has no account system, backend, telemetry, advertising, or third-party tracking.
 
-## What changed in v1.2.1
+## What changed in v1.2.2
 
-Version 1.2.1 corrects the initial empty-board action panel. **Blank Note, Kanban Note, Sticker, Add Frame, Load Example, and Import Board** now bypass canvas marquee and panning handlers, so each control works with either Select or Pan active. The startup controls also stop their click from leaking into the canvas interaction layer.
+Version 1.2.2 adds an **On Hold** checkbox to the Kanban sticky-note template immediately after Status. It defaults to unchecked, remains fully clickable or tappable across its label area, and is included in expanded and compact views. When checked, an **On Hold** badge appears in the Kanban header.
 
-An automated browser regression suite now exercises all six startup actions, including Kanban creation while Pan is selected and a complete JSON import launched from the empty state.
+The new field is fully integrated with local autosave, undo/redo, duplication, search, On Hold filtering, active filter chips, JSON import/export, PNG/PDF rendering, conversion to a blank note, and Clear Field Values. Existing Kanban notes migrate automatically to Kanban template version 2 with On Hold unchecked unless a saved value is present.
+
+Automated Chromium coverage verifies editing, persistence, header and compact rendering, search, filtering, JSON preservation, image/PDF export, and migration of older Kanban notes that do not yet contain the field.
+
+## Included from v1.2.1
+
+Version 1.2.1 corrected the initial empty-board action panel. **Blank Note, Kanban Note, Sticker, Add Frame, Load Example, and Import Board** bypass canvas marquee and panning handlers, so each control works with either Select or Pan active.
 
 ## Included from v1.2.0
 
@@ -160,10 +166,11 @@ Kanban notes include these fields in order:
 7. Reporter
 8. Assignee
 9. Status: Backlog, VP Scheduled, VP Held, Ready, In Dev, UAT, Done
-10. Needs VP?
-11. Need By Date
+10. On Hold
+11. Needs VP?
+12. Need By Date
 
-Kanban notes support expanded and compact views, field-aware search and filters, clean exports, conversion to blank notes, duplication, color changes, connectors, grouping, locking, frames, local autosave, and undo/redo.
+Kanban notes support expanded and compact views, On Hold and Needs VP indicators, field-aware search and filters, clean exports, conversion to blank notes, duplication, color changes, connectors, grouping, locking, frames, local autosave, and undo/redo.
 
 ## Run the application
 
@@ -183,11 +190,12 @@ python3 -m http.server 8080
 
 Then open `http://localhost:8080`.
 
-After replacing an older deployment, reload once so the `tackboard-v1.2.1` service-worker cache takes control.
+After replacing an older deployment, reload once so the `tackboard-v1.2.2` service-worker cache takes control.
 
 ## Data, migration, and privacy
 
 - Existing compatible v1.x data is normalized into schema version 2 automatically.
+- Existing Kanban notes are migrated to Kanban template version 2; a missing On Hold field becomes unchecked.
 - IndexedDB is the primary storage system.
 - localStorage is used only when IndexedDB is unavailable and for the emergency snapshot.
 - Use **Complete Backup JSON** for portable backups and before clearing browser data.

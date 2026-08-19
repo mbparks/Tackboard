@@ -27,6 +27,14 @@ def run() -> None:
                 page.evaluate("window.TACKBOARD_DEBUG.loadExampleBoard()")
                 page.wait_for_timeout(300)
 
+                # Set the new Kanban On Hold field before export.
+                kanban_id = page.evaluate('window.TACKBOARD_DEBUG.getCurrentBoard().objects.find(o=>o.objectType==="template-note").id')
+                page.evaluate("id => window.TACKBOARD_DEBUG.selectIds([id])", kanban_id)
+                page.keyboard.press("Enter")
+                page.locator(f'[data-object-id="{kanban_id}"] [data-kanban-field="onHold"]').check()
+                page.locator(f'[data-object-id="{kanban_id}"] [data-finish-edit]').click()
+                page.wait_for_timeout(120)
+
                 # Current-board JSON download.
                 page.locator("#exportButton").click()
                 with page.expect_download() as download_info:
@@ -37,7 +45,11 @@ def run() -> None:
                 payload = json.loads(json_path.read_text(encoding="utf-8"))
                 assert_true(payload["format"] == "tackboard-board", "JSON export format marker is incorrect")
                 assert_true(payload["schemaVersion"] == 2, "JSON export schema version is incorrect")
+                assert_true(payload["appVersion"] == "1.2.2", "JSON export app version is incorrect")
                 assert_true(len(payload["board"]["objects"]) >= 7, "JSON export lost board objects")
+                exported_kanban = next(obj for obj in payload["board"]["objects"] if obj["objectType"] == "template-note")
+                assert_true(exported_kanban["templateVersion"] == 2, "Kanban template version was not upgraded")
+                assert_true(exported_kanban["fields"]["onHold"] is True, "JSON export lost the On Hold value")
 
                 # PNG rendering with preview.
                 page.locator("#exportButton").click()
@@ -67,7 +79,7 @@ def run() -> None:
                 import_payload = {
                     "format": "tackboard-board",
                     "schemaVersion": 2,
-                    "appVersion": "1.2.1",
+                    "appVersion": "1.2.2",
                     "board": {
                         "name": "Imported Board",
                         "description": "Automated import test",
@@ -88,6 +100,32 @@ def run() -> None:
                             "color": "yellow",
                             "zIndex": 1,
                             "rotation": 0,
+                        }, {
+                            "id": "kanban-import",
+                            "objectType": "template-note",
+                            "templateId": "kanban",
+                            "templateVersion": 1,
+                            "displayMode": "expanded",
+                            "x": 850,
+                            "y": 420,
+                            "width": 360,
+                            "height": 650,
+                            "color": "blue",
+                            "zIndex": 2,
+                            "rotation": 0,
+                            "fields": {
+                                "ticketNumber": "OLD-1",
+                                "ticketType": "Story",
+                                "sprintNumber": "",
+                                "epic": "Migration",
+                                "description": "Older Kanban data without On Hold",
+                                "team": "SPA",
+                                "reporter": "",
+                                "assignee": "",
+                                "status": "Backlog",
+                                "needsVP": False,
+                                "needByDate": "",
+                            },
                         }],
                         "connectors": [],
                     },
@@ -102,6 +140,9 @@ def run() -> None:
                 assert_true(len(state["boards"]) == 3, "Imported board was not added")
                 assert_true(state["boards"][-1]["name"] == "Imported Board", "Imported board name changed unexpectedly")
                 assert_true(page.locator('[data-object-id="note-import"]').count() == 1, "Imported note was not rendered")
+                imported_kanban = next(obj for obj in state["boards"][-1]["objects"] if obj["id"] == "kanban-import")
+                assert_true(imported_kanban["templateVersion"] == 2, "Older Kanban template was not migrated")
+                assert_true(imported_kanban["fields"]["onHold"] is False, "Missing On Hold field did not migrate to unchecked")
 
                 # Malformed JSON produces a visible error instead of crashing.
                 bad_path = temp / "bad.json"

@@ -69,7 +69,7 @@
     ui.searchQuery = '';
     ui.searchResults = [];
     ui.searchIndex = -1;
-    ui.filters = { template: '', ticketType: '', team: '', status: '', needsVP: '', due: '', from: '', to: '' };
+    ui.filters = { template: '', ticketType: '', team: '', status: '', onHold: '', needsVP: '', due: '', from: '', to: '' };
     ui.connectorSourceId = null;
     syncHistoryAlias();
     closePopover();

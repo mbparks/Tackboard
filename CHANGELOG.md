@@ -1,5 +1,15 @@
 # TACKBOARD changelog
 
+## v1.2.2 — Kanban On Hold field
+
+- Added an **On Hold** checkbox immediately after Status in the Kanban template.
+- Added an On Hold header badge and Compact View field.
+- Added On Hold search semantics, Yes/No filtering, active filter chips, and reset handling.
+- Preserved On Hold through autosave, undo/redo, duplication, JSON import/export, PNG/PDF export, and conversion to a blank note.
+- Updated Clear Field Values so On Hold resets to unchecked.
+- Advanced the Kanban template to version 2 and automatically migrated older notes with the field defaulting to unchecked.
+- Added automated browser coverage for editing, rendering, search, filtering, export, and migration.
+
 ## v1.2.1 — Initial empty-state controls
 
 - Fixed all six initial-load buttons: Blank Note, Kanban Note, Sticker, Add Frame, Load Example, and Import Board.

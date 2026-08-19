@@ -33,7 +33,7 @@ def run() -> None:
         try:
             # Blank Note must work in Select mode.
             page, page_errors, console_errors = open_app(browser)
-            assert_true(page.evaluate("window.TACKBOARD_DEBUG.version") == "1.2.1", "version mismatch")
+            assert_true(page.evaluate("window.TACKBOARD_DEBUG.version") == "1.2.2", "version mismatch")
             page.locator('[data-empty-action="blank"]').click()
             page.wait_for_timeout(160)
             assert_true(page.locator('[data-object-type="blank-note"]').count() == 1, "Blank Note startup button did not create a note")
@@ -84,7 +84,7 @@ def run() -> None:
             payload = {
                 "format": "tackboard-board",
                 "schemaVersion": 2,
-                "appVersion": "1.2.1",
+                "appVersion": "1.2.2",
                 "board": {
                     "name": "Startup Import",
                     "description": "Empty-state import regression",

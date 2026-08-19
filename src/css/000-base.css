@@ -530,6 +530,7 @@
   .badge.status-vp-scheduled, .badge.status-vp-held { background: rgba(137,85,145,.20); }
   .badge.status-ready { background: rgba(44,111,105,.20); }
   .badge.status-backlog { background: rgba(80,85,88,.14); }
+  .badge.on-hold { border-color: rgba(156,101,24,.34); background: rgba(177,120,35,.22); }
   .badge.due-overdue { border-color: rgba(160,50,50,.42); background: rgba(160,50,50,.15); }
 
   .kanban-body {

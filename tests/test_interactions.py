@@ -22,7 +22,7 @@ def run() -> None:
         try:
             page.set_content(html, wait_until="load")
             page.wait_for_timeout(300)
-            assert_true(page.evaluate("window.TACKBOARD_DEBUG.version") == "1.2.1", "visible/debug version mismatch")
+            assert_true(page.evaluate("window.TACKBOARD_DEBUG.version") == "1.2.2", "visible/debug version mismatch")
             page.evaluate("window.TACKBOARD_DEBUG.loadExampleBoard()")
             page.wait_for_timeout(500)
 
@@ -137,16 +137,65 @@ def run() -> None:
             assert_true(page.locator(f'[data-object-id="{text_id}"] [data-finish-edit]').count() == 1, "Explicit Done control is missing")
             page.locator(f'[data-object-id="{text_id}"] [data-finish-edit]').click()
 
-            # Active filter chips and count.
+            # Kanban On Hold checkbox, badge, search, compact view, and filter integration.
+            kanban_id = page.evaluate('window.TACKBOARD_DEBUG.getCurrentBoard().objects.find(o=>o.objectType==="template-note").id')
+            page.evaluate("id => window.TACKBOARD_DEBUG.selectIds([id])", kanban_id)
+            page.keyboard.press("Enter")
+            page.wait_for_timeout(100)
+            on_hold = page.locator(f'[data-object-id="{kanban_id}"] [data-kanban-field="onHold"]')
+            assert_true(on_hold.count() == 1, "On Hold checkbox is missing from Kanban edit mode")
+            assert_true(not on_hold.is_checked(), "On Hold should default to unchecked")
+            on_hold.check()
+            page.locator(f'[data-object-id="{kanban_id}"] [data-finish-edit]').click()
+            page.wait_for_timeout(120)
+            assert_true(page.evaluate("id => window.TACKBOARD_DEBUG.getCurrentBoard().objects.find(o=>o.id===id).fields.onHold", kanban_id), "On Hold value was not stored")
+            assert_true(page.locator(f'[data-object-id="{kanban_id}"] .badge.flag-on-hold').inner_text() == "On Hold", "On Hold header badge is missing")
+
+            page.locator(f'[data-object-id="{kanban_id}"] [data-toggle-compact]').click()
+            page.wait_for_timeout(100)
+            compact_text = page.locator(f'[data-object-id="{kanban_id}"] .kanban-body').inner_text()
+            assert_true("ON HOLD" in compact_text and "Yes" in compact_text, "On Hold is missing from Compact View")
+
+            page.locator("#searchButton").click()
+            page.fill("#searchInput", "On Hold")
+            page.wait_for_timeout(100)
+            assert_true("0 results" not in page.locator("#searchCount").inner_text(), "On Hold search did not match the checked Kanban note")
+            page.locator("#searchClose").click()
+
+            # Active filter chips and count, including the new On Hold filter.
             page.locator("#filterButton").click()
             page.select_option("#filterTeam", "SPA")
+            page.select_option("#filterOnHold", "yes")
             page.locator('#filterForm button[type="submit"]').click()
             page.wait_for_timeout(120)
             assert_true(page.locator("#activeFilterBar.visible").count() == 1, "Active filter bar is missing")
-            assert_true(page.locator('[data-clear-filter="team"]').count() == 1, "Filter chip is missing")
+            assert_true(page.locator('[data-clear-filter="team"]').count() == 1, "Team filter chip is missing")
+            assert_true(page.locator('[data-clear-filter="onHold"]').count() == 1, "On Hold filter chip is missing")
             page.locator('[data-clear-filter="team"]').click()
+            page.locator('[data-clear-filter="onHold"]').click()
             page.wait_for_timeout(80)
-            assert_true(page.locator("#activeFilterBar.visible").count() == 0, "Filter chip did not clear")
+            assert_true(page.locator("#activeFilterBar.visible").count() == 0, "Filter chips did not clear")
+
+            # Clear Fields resets On Hold, and conversion preserves it as readable text.
+            page.evaluate("id => window.TACKBOARD_DEBUG.selectIds([id])", kanban_id)
+            page.locator('#contextToolbar [data-action="more"]').click()
+            page.locator('[data-pop-action="clear-kanban"]').click()
+            page.locator('dialog[open] [data-dialog-value="1"]').click()
+            page.wait_for_timeout(120)
+            assert_true(not page.evaluate("id => window.TACKBOARD_DEBUG.getCurrentBoard().objects.find(o=>o.id===id).fields.onHold", kanban_id), "Clear Field Values did not reset On Hold")
+            page.evaluate("window.TACKBOARD_DEBUG.undo()")
+            page.wait_for_timeout(120)
+            assert_true(page.evaluate("id => window.TACKBOARD_DEBUG.getCurrentBoard().objects.find(o=>o.id===id).fields.onHold", kanban_id), "Undo did not restore On Hold")
+
+            page.evaluate("id => window.TACKBOARD_DEBUG.selectIds([id])", kanban_id)
+            page.locator('#contextToolbar [data-action="more"]').click()
+            page.locator('[data-pop-action="convert-kanban"]').click()
+            page.locator('dialog[open] [data-dialog-value="1"]').click()
+            page.wait_for_timeout(120)
+            converted = page.evaluate("id => window.TACKBOARD_DEBUG.getCurrentBoard().objects.find(o=>o.id===id)", kanban_id)
+            assert_true(converted["objectType"] == "blank-note" and "On Hold: Yes" in converted["content"], "Kanban conversion did not preserve On Hold")
+            page.evaluate("window.TACKBOARD_DEBUG.undo()")
+            page.wait_for_timeout(120)
 
             # Keyboard-operable popover and focus return.
             page.locator("#boardButton").click()

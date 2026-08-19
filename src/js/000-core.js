@@ -1,7 +1,7 @@
 
 (() => {
   'use strict';
-  const APP_VERSION = '1.2.1';
+  const APP_VERSION = '1.2.2';
   const WORLD = Object.freeze({ width: 12000, height: 8000 });
   const DB_NAME = 'tackboard-db';
   const DB_VERSION = 1;
@@ -40,12 +40,12 @@
   const KANBAN_SCHEMA = Object.freeze({
     templateId: 'kanban',
     templateName: 'Kanban',
-    templateVersion: 1,
+    templateVersion: 2,
     defaultDimensions: { width: 360, height: 650 },
     compactDimensions: { width: 340, height: 280 },
     defaultColor: 'yellow',
     headerFields: ['ticketNumber', 'ticketType', 'status'],
-    compactViewFields: ['ticketNumber', 'ticketType', 'status', 'team', 'assignee', 'needByDate', 'needsVP'],
+    compactViewFields: ['ticketNumber', 'ticketType', 'status', 'team', 'assignee', 'onHold', 'needByDate', 'needsVP'],
     fields: [
       { key: 'ticketNumber', label: 'Ticket #:', type: 'text', placeholder: 'ABC-123', defaultValue: '', searchable: true },
       { key: 'ticketType', label: 'Ticket Type:', type: 'dropdown', options: TICKET_TYPES, defaultValue: 'Story', searchable: true, filterable: true },
@@ -56,6 +56,7 @@
       { key: 'reporter', label: 'Reporter:', type: 'text', placeholder: 'Name, username, email, or team', defaultValue: '', searchable: true },
       { key: 'assignee', label: 'Assignee:', type: 'text', placeholder: 'Name, username, email, or team', defaultValue: '', searchable: true },
       { key: 'status', label: 'Status:', type: 'dropdown', options: STATUS_OPTIONS, defaultValue: 'Backlog', searchable: true, filterable: true },
+      { key: 'onHold', label: 'On Hold', type: 'checkbox', defaultValue: false, searchable: true, filterable: true },
       { key: 'needsVP', label: 'Needs VP?', type: 'checkbox', defaultValue: false, searchable: true, filterable: true },
       { key: 'needByDate', label: 'Need By Date:', type: 'date', defaultValue: '', searchable: true, filterable: true }
     ]
@@ -251,7 +252,7 @@
     searchResults: [],
     searchIndex: -1,
     filters: {
-      template: '', ticketType: '', team: '', status: '', needsVP: '', due: '', from: '', to: ''
+      template: '', ticketType: '', team: '', status: '', onHold: '', needsVP: '', due: '', from: '', to: ''
     },
     history: { undo: [], redo: [] },
     clipboard: null,
@@ -309,7 +310,7 @@
       return {
         ...base,
         templateId: obj.templateId || 'kanban',
-        templateVersion: Number(obj.templateVersion) || 1,
+        templateVersion: KANBAN_SCHEMA.templateVersion,
         displayMode: obj.displayMode === 'compact' ? 'compact' : 'expanded',
         fields
       };
@@ -617,7 +618,7 @@
       id: uuid('kanban'),
       objectType: 'template-note',
       templateId: 'kanban',
-      templateVersion: 1,
+      templateVersion: KANBAN_SCHEMA.templateVersion,
       x: pos.x,
       y: pos.y,
       width,
@@ -837,6 +838,7 @@
           <div class="kanban-badges">
             <span class="badge">${escapeHTML(f.ticketType || 'Story')}</span>
             <span class="badge ${statusClass(f.status)}">${escapeHTML(f.status || 'Backlog')}</span>
+            ${f.onHold ? '<span class="badge on-hold flag-on-hold">On Hold</span>' : ''}
             ${f.needsVP ? '<span class="badge">Needs VP</span>' : ''}
             ${f.needByDate ? `<span class="badge ${dueClass}" title="${escapeAttr(formatDate(f.needByDate))}">${escapeHTML(formatRelativeDate(f.needByDate))}</span>` : ''}
           </div>
@@ -984,6 +986,7 @@
     if (obj.objectType === 'blank-note') return [obj.title, obj.content, obj.tag].join(' ');
     if (obj.objectType === 'template-note') {
       const parts = KANBAN_SCHEMA.fields.map(field => {
+        if (field.key === 'onHold') return obj.fields.onHold ? 'On Hold Hold Yes' : 'No';
         if (field.key === 'needsVP') return obj.fields.needsVP ? 'VP Needs VP Yes' : 'No';
         return obj.fields[field.key];
       });
@@ -1024,12 +1027,14 @@
     if (!hasActiveFilters()) return true;
     if (ui.filters.template && ui.filters.template !== obj.objectType) return false;
     if (obj.objectType !== 'template-note') {
-      return !ui.filters.ticketType && !ui.filters.team && !ui.filters.status && !ui.filters.needsVP && !ui.filters.due && !ui.filters.from && !ui.filters.to;
+      return !ui.filters.ticketType && !ui.filters.team && !ui.filters.status && !ui.filters.onHold && !ui.filters.needsVP && !ui.filters.due && !ui.filters.from && !ui.filters.to;
     }
     const fields = obj.fields;
     if (ui.filters.ticketType && fields.ticketType !== ui.filters.ticketType) return false;
     if (ui.filters.team && fields.team !== ui.filters.team) return false;
     if (ui.filters.status && fields.status !== ui.filters.status) return false;
+    if (ui.filters.onHold === 'yes' && !fields.onHold) return false;
+    if (ui.filters.onHold === 'no' && fields.onHold) return false;
     if (ui.filters.needsVP === 'yes' && !fields.needsVP) return false;
     if (ui.filters.needsVP === 'no' && fields.needsVP) return false;
     if (!matchesDueFilter(obj, ui.filters.due)) return false;
@@ -1645,7 +1650,7 @@
   async function clearKanbanValues() {
     const note = selectedObjects().find(obj => obj.objectType === 'template-note');
     if (!note) return;
-    const confirmed = await confirmDialog('Clear all Kanban fields?', 'All entered values will be cleared. Ticket Type will return to Story, Status to Backlog, and Needs VP will be unchecked.', 'Clear Fields');
+    const confirmed = await confirmDialog('Clear all Kanban fields?', 'All entered values will be cleared. Ticket Type will return to Story, Status to Backlog, and On Hold and Needs VP will be unchecked.', 'Clear Fields');
     if (!confirmed) return;
     pushHistory('Clear Kanban fields');
     for (const field of KANBAN_SCHEMA.fields) note.fields[field.key] = deepClone(field.defaultValue);
@@ -1666,6 +1671,7 @@
       `Reporter: ${f.reporter || ''}`,
       `Assignee: ${f.assignee || ''}`,
       `Status: ${f.status || 'Backlog'}`,
+      `On Hold: ${f.onHold ? 'Yes' : 'No'}`,
       `Needs VP?: ${f.needsVP ? 'Yes' : 'No'}`,
       `Need By Date: ${f.needByDate || ''}`
     ].join('\n');
@@ -1936,6 +1942,7 @@
         <div class="form-row"><label for="filterTicketType">Ticket Type</label><select id="filterTicketType" name="ticketType">${filterOptions(TICKET_TYPES, f.ticketType)}</select></div>
         <div class="form-row"><label for="filterTeam">Team</label><select id="filterTeam" name="team">${filterOptions(TEAM_OPTIONS, f.team)}</select></div>
         <div class="form-row"><label for="filterStatus">Status</label><select id="filterStatus" name="status">${filterOptions(STATUS_OPTIONS, f.status)}</select></div>
+        <div class="form-row"><label for="filterOnHold">On Hold</label><select id="filterOnHold" name="onHold"><option value="" ${!f.onHold ? 'selected' : ''}>Either</option><option value="yes" ${f.onHold === 'yes' ? 'selected' : ''}>Yes</option><option value="no" ${f.onHold === 'no' ? 'selected' : ''}>No</option></select></div>
         <div class="form-row"><label for="filterNeedsVP">Needs VP</label><select id="filterNeedsVP" name="needsVP"><option value="" ${!f.needsVP ? 'selected' : ''}>Either</option><option value="yes" ${f.needsVP === 'yes' ? 'selected' : ''}>Yes</option><option value="no" ${f.needsVP === 'no' ? 'selected' : ''}>No</option></select></div>
         <div class="form-row"><label for="filterDue">Need By Date</label><select id="filterDue" name="due"><option value="" ${!f.due ? 'selected' : ''}>Any date</option><option value="none" ${f.due === 'none' ? 'selected' : ''}>No date</option><option value="overdue" ${f.due === 'overdue' ? 'selected' : ''}>Overdue</option><option value="today" ${f.due === 'today' ? 'selected' : ''}>Due today</option><option value="week" ${f.due === 'week' ? 'selected' : ''}>Due this week</option><option value="month" ${f.due === 'month' ? 'selected' : ''}>Due this month</option><option value="custom" ${f.due === 'custom' ? 'selected' : ''}>Custom range</option></select></div>
         <div class="form-row ${f.due === 'custom' ? '' : 'hidden'}" data-custom-dates><label>Date range</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px"><input type="date" name="from" value="${escapeAttr(f.from)}" aria-label="Start date"><input type="date" name="to" value="${escapeAttr(f.to)}" aria-label="End date"></div></div>
@@ -2006,7 +2013,7 @@
     ui.searchQuery = '';
     ui.searchResults = [];
     ui.searchIndex = -1;
-    ui.filters = { template: '', ticketType: '', team: '', status: '', needsVP: '', due: '', from: '', to: '' };
+    ui.filters = { template: '', ticketType: '', team: '', status: '', onHold: '', needsVP: '', due: '', from: '', to: '' };
     ui.connectorSourceId = null;
     resetHistory();
     closePopover();
@@ -2103,7 +2110,7 @@
     const ideas = createBlankNote({ x: 980, y: 500 }, { width: 280, height: 230, title: 'Release checklist', content: 'Confirm scope\nReview design\nRun accessibility pass\nExport evidence', checklist: true, tag: 'CHECKLIST', color: 'green' });
     ideas.x = 810; ideas.y = 350; ideas.zIndex = 3;
     const ticket = createKanbanNote({ x: 1350, y: 620 }, { displayMode: 'compact', width: 350, height: 285, color: 'blue', fields: {
-      ticketNumber: 'TB-101', ticketType: 'Story', sprintNumber: 'Sprint 1', epic: 'Canvas Basics', description: 'Make the first-use board experience calm, clear, and fast.', team: 'SPA', reporter: 'Alex Morgan', assignee: 'Casey Lee', status: 'In Dev', needsVP: true, needByDate: ''
+      ticketNumber: 'TB-101', ticketType: 'Story', sprintNumber: 'Sprint 1', epic: 'Canvas Basics', description: 'Make the first-use board experience calm, clear, and fast.', team: 'SPA', reporter: 'Alex Morgan', assignee: 'Casey Lee', status: 'In Dev', onHold: false, needsVP: true, needByDate: ''
     }});
     ticket.x = 1160; ticket.y = 350; ticket.zIndex = 4;
     const label = createTextObject({ x: 910, y: 950 }, { width: 440, height: 64, text: 'CREATE → ARRANGE → CONNECT → REFINE → SAVE', fontSize: 22 });
@@ -2769,6 +2776,7 @@
       const badgeY = obj.y + 29;
       badgeX += drawCanvasBadge(ctx, f.ticketType || 'Story', badgeX, badgeY, 105, 'rgba(255,255,255,.24)', ink) + 5;
       badgeX += drawCanvasBadge(ctx, f.status || 'Backlog', badgeX, badgeY, Math.max(90, obj.width - (badgeX - obj.x) - 12), 'rgba(255,255,255,.24)', ink) + 5;
+      if (f.onHold && badgeX < obj.x + obj.width - 60) badgeX += drawCanvasBadge(ctx, 'On Hold', badgeX, badgeY, 70, 'rgba(177,120,35,.24)', ink) + 5;
       if (f.needsVP && badgeX < obj.x + obj.width - 60) drawCanvasBadge(ctx, 'Needs VP', badgeX, badgeY, 80, 'rgba(255,255,255,.24)', ink);
 
       const compact = obj.displayMode === 'compact';
@@ -3868,7 +3876,7 @@
     else if (action === 'export-pdf-selection') exportPDF('selection', { tiled: false });
     else if (action === 'import-json') { closePopover(); els.importInput.click(); }
     else if (action === 'reset-filters') {
-      ui.filters = { template: '', ticketType: '', team: '', status: '', needsVP: '', due: '', from: '', to: '' };
+      ui.filters = { template: '', ticketType: '', team: '', status: '', onHold: '', needsVP: '', due: '', from: '', to: '' };
       closePopover();
       renderAll();
     }
@@ -3939,6 +3947,7 @@
       ticketType: form.get('ticketType') || '',
       team: form.get('team') || '',
       status: form.get('status') || '',
+      onHold: form.get('onHold') || '',
       needsVP: form.get('needsVP') || '',
       due: form.get('due') || '',
       from: form.get('from') || '',

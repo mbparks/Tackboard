@@ -155,12 +155,12 @@
     }
     const labels = {
       template: 'Object', ticketType: 'Type', team: 'Team', status: 'Status',
-      needsVP: 'Needs VP', due: 'Due', from: 'From', to: 'To'
+      onHold: 'On Hold', needsVP: 'Needs VP', due: 'Due', from: 'From', to: 'To'
     };
     const valueLabel = (key, value) => {
       if (key === 'template') return ({ 'template-note': 'Kanban', 'blank-note': 'Blank notes', text: 'Text labels', sticker: 'Stickers', frame: 'Frames' })[value] || value;
       if (key === 'due') return ({ none: 'No date', overdue: 'Overdue', today: 'Today', week: 'This week', month: 'This month', custom: 'Custom range' })[value] || value;
-      if (key === 'needsVP') return value === 'yes' ? 'Yes' : 'No';
+      if (key === 'onHold' || key === 'needsVP') return value === 'yes' ? 'Yes' : 'No';
       if (key === 'from' || key === 'to') return formatDate(value) || value;
       return value;
     };
