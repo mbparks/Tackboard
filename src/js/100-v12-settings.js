@@ -45,7 +45,7 @@
     closePopover();
     showDialog({
       title: 'Help & keyboard shortcuts',
-      bodyHTML: `<p>Use the arrow tool to select and arrange objects. Use the hand tool to pan the board with an ordinary left-drag. On touch devices, Select uses one finger for object movement or a selection rectangle, while Pan uses one finger for navigation; two fingers always pan and zoom.</p>
+      bodyHTML: `<p>Use the arrow tool to select and arrange objects. Use the hand tool to pan the board with an ordinary left-drag. On touch devices, Select uses one finger for object movement or a selection rectangle, while Pan uses one finger for navigation; two fingers always pan and zoom.</p><p>Kanban notes use stable Compact and Expanded summary cards. Press Enter or choose <strong>Edit Fields</strong> to open the separate editor sheet without changing the card size. Kanban cards resize horizontally only; long descriptions open through <strong>Read more</strong>.</p>
         <div class="shortcut-grid">
           <kbd>V / H</kbd><span>Select / Pan tool</span>
           <kbd>N / Shift + N</kbd><span>Create default note / open note picker</span>

@@ -45,7 +45,7 @@ def run() -> None:
                 payload = json.loads(json_path.read_text(encoding="utf-8"))
                 assert_true(payload["format"] == "tackboard-board", "JSON export format marker is incorrect")
                 assert_true(payload["schemaVersion"] == 2, "JSON export schema version is incorrect")
-                assert_true(payload["appVersion"] == "1.2.2", "JSON export app version is incorrect")
+                assert_true(payload["appVersion"] == "1.3.0", "JSON export app version is incorrect")
                 assert_true(len(payload["board"]["objects"]) >= 7, "JSON export lost board objects")
                 exported_kanban = next(obj for obj in payload["board"]["objects"] if obj["objectType"] == "template-note")
                 assert_true(exported_kanban["templateVersion"] == 2, "Kanban template version was not upgraded")
@@ -79,7 +79,7 @@ def run() -> None:
                 import_payload = {
                     "format": "tackboard-board",
                     "schemaVersion": 2,
-                    "appVersion": "1.2.2",
+                    "appVersion": "1.3.0",
                     "board": {
                         "name": "Imported Board",
                         "description": "Automated import test",

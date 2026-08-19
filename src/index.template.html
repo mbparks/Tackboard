@@ -15,7 +15,7 @@
       <div class="brand-mark" aria-hidden="true">T</div>
       <div class="brand-copy">
         <div class="brand-title">TACKBOARD</div>
-        <div class="brand-meta">v1.2.2 · LOCAL &amp; PRIVATE</div>
+        <div class="brand-meta">v1.3.0 · LOCAL &amp; PRIVATE</div>
       </div>
     </div>
 
@@ -120,6 +120,28 @@
   </main>
 
   <div id="contextToolbar" class="context-toolbar" role="toolbar" aria-label="Selection actions"></div>
+
+  <div id="kanbanEditorBackdrop" class="kanban-editor-backdrop" hidden></div>
+  <aside id="kanbanEditorSheet" class="kanban-editor-sheet" role="dialog" aria-modal="false" aria-hidden="true" aria-labelledby="kanbanEditorTitle" hidden>
+    <header class="kanban-editor-header">
+      <div class="kanban-editor-heading">
+        <span class="kanban-editor-kicker">Kanban fields</span>
+        <h2 id="kanbanEditorTitle">Edit Kanban note</h2>
+        <p id="kanbanEditorSubtitle">Changes save locally as you work; Cancel restores this editing session.</p>
+      </div>
+      <button id="kanbanEditorClose" class="kanban-editor-close" type="button" aria-label="Cancel editing">×</button>
+    </header>
+    <form id="kanbanEditorForm" class="kanban-editor-form" autocomplete="off">
+      <div id="kanbanEditorBody" class="kanban-editor-body"></div>
+      <footer class="kanban-editor-footer">
+        <span id="kanbanEditorStatus" class="kanban-editor-status" role="status" aria-live="polite">No changes yet</span>
+        <div class="kanban-editor-actions">
+          <button id="kanbanEditorCancel" class="button ghost" type="button">Cancel</button>
+          <button id="kanbanEditorDone" class="button primary" type="submit" data-finish-edit="true">Done</button>
+        </div>
+      </footer>
+    </form>
+  </aside>
 
   <div class="viewport-controls" aria-label="Viewport controls">
     <button id="zoomOut" type="button" title="Zoom out" aria-label="Zoom out">−</button>

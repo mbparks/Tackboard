@@ -22,7 +22,7 @@ def run() -> None:
         try:
             page.set_content(html, wait_until="load")
             page.wait_for_timeout(300)
-            assert_true(page.evaluate("window.TACKBOARD_DEBUG.version") == "1.2.2", "visible/debug version mismatch")
+            assert_true(page.evaluate("window.TACKBOARD_DEBUG.version") == "1.3.0", "visible/debug version mismatch")
             page.evaluate("window.TACKBOARD_DEBUG.loadExampleBoard()")
             page.wait_for_timeout(500)
 

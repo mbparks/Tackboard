@@ -1,7 +1,7 @@
 
 (() => {
   'use strict';
-  const APP_VERSION = '1.2.2';
+  const APP_VERSION = '1.3.0';
   const WORLD = Object.freeze({ width: 12000, height: 8000 });
   const DB_NAME = 'tackboard-db';
   const DB_VERSION = 1;
@@ -41,8 +41,8 @@
     templateId: 'kanban',
     templateName: 'Kanban',
     templateVersion: 2,
-    defaultDimensions: { width: 360, height: 650 },
-    compactDimensions: { width: 340, height: 280 },
+    defaultDimensions: { width: 380, height: 474 },
+    compactDimensions: { width: 340, height: 286 },
     defaultColor: 'yellow',
     headerFields: ['ticketNumber', 'ticketType', 'status'],
     compactViewFields: ['ticketNumber', 'ticketType', 'status', 'team', 'assignee', 'onHold', 'needByDate', 'needsVP'],

@@ -1,34 +1,68 @@
-# TACKBOARD v1.2.2
+# TACKBOARD v1.3.0
 
 **TACKBOARD — A Simple Visual Thinking Space**
 
 TACKBOARD is a calm, local-first virtual whiteboard for arranging freeform sticky notes, structured Kanban notes, stickers, text labels, frames, connectors, and freehand annotations. It has no account system, backend, telemetry, advertising, or third-party tracking.
 
-## What changed in v1.2.2
+## What changed in v1.3.0
 
-Version 1.2.2 adds an **On Hold** checkbox to the Kanban sticky-note template immediately after Status. It defaults to unchecked, remains fully clickable or tappable across its label area, and is included in expanded and compact views. When checked, an **On Hold** badge appears in the Kanban header.
+Version 1.3.0 replaces the old variable-height Kanban form with a consistent **Summary Card + Edit Sheet** model.
 
-The new field is fully integrated with local autosave, undo/redo, duplication, search, On Hold filtering, active filter chips, JSON import/export, PNG/PDF rendering, conversion to a blank note, and Clear Field Values. Existing Kanban notes migrate automatically to Kanban template version 2 with On Hold unchecked unless a saved value is present.
+### Stable Kanban cards
 
-Automated Chromium coverage verifies editing, persistence, header and compact rendering, search, filtering, JSON preservation, image/PDF export, and migration of older Kanban notes that do not yet contain the field.
+Kanban notes now have two predictable board presentations:
 
-## Included from v1.2.1
+- **Compact View — 340 × 286 pixels by default:** Ticket #, Ticket Type, and Status remain in the header; Team, Assignee, Need By Date, On Hold, and Needs VP appear in the summary body.
+- **Expanded View — 380 × 474 pixels by default:** every Kanban field is represented without requiring an internal vertical scrollbar. Description receives a prominent summary area, while Sprint, Epic, Team, Reporter, Assignee, Need By Date, On Hold, and Needs VP use a two-column metadata grid.
 
-Version 1.2.1 corrected the initial empty-board action panel. **Blank Note, Kanban Note, Sticker, Add Frame, Load Example, and Import Board** bypass canvas marquee and panning handlers, so each control works with either Select or Pan active.
+Long descriptions are clamped to a readable summary and expose **Read more** for the complete text. Switching between Compact and Expanded View always restores the corresponding canonical height.
 
-## Included from v1.2.0
+### Detached Kanban editor
 
-Version 1.2.0 introduced the comprehensive interaction, accessibility, reliability, and maintainability improvements below.
+Double-clicking a Kanban card, pressing `Enter`, or choosing **Edit Fields** opens a separate paper-styled editor rather than converting the card itself into a tall form.
 
-### Select and Pan
+- On desktop, the editor appears beside the card when space permits and remains within the viewport.
+- On phones, it becomes a full-width bottom sheet with large Cancel and Done controls.
+- The editor is organized into Identity, Work, Ownership, and State sections.
+- All twelve fields remain available, including On Hold and Needs VP.
+- Changes autosave locally while the editor is open.
+- **Done**, `Escape`, or `Ctrl/Cmd + Enter` keeps the changes.
+- **Cancel** or the editor’s close button restores the values from when that editing session opened.
+- The board card does not move or change dimensions before, during, or after editing.
+
+### Consistent sizing
+
+Kanban cards now resize horizontally only, from 340 to 520 pixels. Their height is controlled by Compact or Expanded View rather than by manual vertical scaling. Group resize and keyboard resize preserve the same rule.
+
+Existing Kanban cards are migrated automatically:
+
+- position, width, color, fields, connectors, grouping, and display mode are preserved
+- width is constrained only when outside the supported range
+- old manual heights are replaced with the correct Compact or Expanded height
+- a `kanbanLayoutVersion` value records the new presentation model
+
+### Exports and accessibility
+
+PNG and PDF rendering now reproduce the new Summary Card layout. Kanban cards remain keyboard-selectable, the detached editor uses associated labels and normal form controls, mobile editing traps focus within the modal bottom sheet, and focus returns to the edited card when the editor closes.
+
+A dedicated browser regression suite covers stable sizing, the desktop editor, the mobile bottom sheet, long-description reading, width-only resizing, Cancel, one-step Undo, migration of older cards, and export compatibility.
+
+## Included from v1.2.2
+
+- **On Hold** checkbox immediately after Status
+- On Hold header badge, Compact View value, search behavior, Yes/No filtering, active-filter chips, JSON preservation, and clean export rendering
+- automatic migration of older Kanban notes with On Hold defaulting to unchecked
+
+## Included from v1.2.x
+
+### Select, Pan, and arrangement
 
 - **Select — arrow icon (`V`)** uses ordinary left-clicks for object selection and ordinary left-drag on open canvas or a frame body for marquee selection.
 - **Pan — hand icon (`H`)** uses ordinary left-drag anywhere, including directly over objects, to move the complete board view.
-- `Space + drag` and middle-button drag remain temporary panning shortcuts from any tool.
-- A unified multi-selection box replaces a crowd of individual resize handles.
-- The selection label moves all movable objects together.
-- A collision-aware group-resize handle remains usable even when the selection reaches the viewport controls or screen edge.
-- Locked objects remain in place during dragging, resizing, alignment, and keyboard movement.
+- `Space + drag` and middle-button drag provide temporary panning from any tool.
+- Unified multi-selection movement and proportional resizing replace a crowd of individual controls.
+- Objects can be position-locked.
+- Frames can collapse and temporarily dim content inside their previous expanded bounds.
 
 ### Mobile and touch
 
@@ -37,79 +71,88 @@ Version 1.2.0 introduced the comprehensive interaction, accessibility, reliabili
 - Two-finger gestures always pan and zoom.
 - **Add Selection** provides a touch equivalent to Shift-click.
 - Long-pressing a selected object opens its More menu.
-- The phone top bar is reduced to the board switcher, application menu, and save indicator.
-- Menus become bottom sheets on narrow screens.
-- Blank notes, Kanban notes, and text labels include a visible **Done** control while editing.
-- Fit Content uses a readable minimum zoom on phones; Overview remains available for seeing the complete board.
+- Menus use bottom sheets on narrow screens.
 
 ### Keyboard and accessibility
 
 - Arrow keys nudge selected objects by one pixel.
 - `Shift + Arrow` nudges by ten pixels.
-- `Alt/Option + Arrow` resizes selected objects.
-- `2` zooms to the current selection; `3` opens a complete board overview.
+- `Alt/Option + Arrow` resizes selected objects; for Kanban cards, horizontal arrows change width while height remains canonical.
 - Focusing a board object selects it and exposes `aria-selected` state.
 - Drawings and connectors are keyboard-focusable and have accessible names.
-- Popovers support Arrow, Home, End, Enter, and Escape behavior and return focus to their invoking control.
-- Tool buttons use a consistent inline SVG icon family.
-- Selection remains visible through outlines and text rather than relying only on color.
-
-### Notes, labels, frames, and filters
-
-- Text labels now expose the same restrained color palette used by board lines.
-- Objects can be position-locked without preventing editing, search, export, or duplication.
-- Frames can collapse to their header and temporarily dim content located inside their previous expanded bounds.
-- Dragging empty-looking frame body space in Select mode starts marquee selection; the frame header remains the frame drag surface.
-- Active filters appear as removable chips with a visible result count and one-click Reset action.
-
-### Navigation
-
-- **Zoom to Selection** centers the current selection at a readable scale.
-- **Overview** shows all board content.
-- The minimap is content-aware instead of always scaling the complete 12,000 × 8,000 world.
-- The multi-selection resize handle automatically avoids the viewport controls, minimap, context toolbar, and tool dock.
+- Popovers support Arrow, Home, End, Enter, and Escape navigation and return focus to their invoking control.
 
 ### Local data and recovery
 
-- Schema version 2 automatically migrates existing TACKBOARD data.
-- IndexedDB stores a lightweight application index and individual board records, so unchanged boards do not need to be rewritten after every edit.
+- IndexedDB stores a lightweight application index and separate board records.
 - localStorage remains a fallback when IndexedDB is unavailable.
-- A newer emergency snapshot can recover work after an interrupted or failed save.
-- Save failures produce a persistent warning with **Retry Save** and **Export Backup** actions.
-- The save-status button shows the last successful save and active storage method.
-- Duplicate toast messages are consolidated rather than stacked repeatedly.
-- Undo and redo histories are maintained independently for each board during the current session and survive board switching.
+- A newer emergency snapshot can recover interrupted work.
+- Save failures provide persistent **Retry Save** and **Export Backup** actions.
+- Undo and redo histories remain separate for each board during the current session.
 
 ### Import and export
 
-- Export menus now include a freely dragged **Selected Area** for PNG and PDF.
-- PNG and PDF actions present a preview with scope, board area, output pixel dimensions, render scale, background, and estimated page count.
-- Settings include a default export format: JSON, PNG, or PDF.
-- Quick Export uses that preferred format while the complete export menu remains available.
-- Existing current-board, selection, complete-backup, viewport, one-page, and tiled export modes remain available.
-
-### Development structure and tests
-
-The deployed app remains a single self-contained `index.html`, while the package now includes modular development source, a deterministic build script, and automated Playwright regression tests.
+- Current-board, selected-object, complete-backup, viewport, selected-area, one-page, and tiled export modes
+- JSON, PNG, and PDF/print output
+- export previews with scope, dimensions, scale, background, and estimated page count
+- configurable default export format and Quick Export
 
 ## Core workflow
 
 **CREATE → ARRANGE → CONNECT → REFINE → SAVE**
 
-1. Use **Select** to choose, marquee-select, move, resize, align, group, or edit objects.
+1. Use **Select** to choose, marquee-select, move, align, group, or edit objects.
 2. Use **Pan** to navigate with an ordinary left-drag.
 3. Double-click empty board space in Select mode to create a blank sticky note.
 4. Use the Sticky Note menu or `Shift + N` to choose Blank Note or Kanban.
 5. Use the Sticker menu or `Shift + S` to choose reactions, markers, and arrows.
 6. Drag notes by their headers. Stickers and text labels can be dragged from their surfaces.
 7. Select an object to reveal its compact contextual toolbar.
-8. Double-click a note or press Enter while selected to edit it.
+8. For a Kanban card, choose **Edit Fields**, double-click it, or press `Enter` to open the editor sheet.
 9. Use the board switcher to create, rename, duplicate, delete, and search boards.
-10. Use Quick Export for the preferred format or open the full Import & Export menu.
+10. Use Quick Export for the preferred format or open the complete Import & Export menu.
+
+## Kanban card behavior
+
+### Compact and Expanded View
+
+Use the arrow control in the card header or the contextual **Expand/Collapse** action. The mode is stored with the note and never changes field values.
+
+Expanded View represents every field. Description may be summarized to keep the card readable; **Read more** opens the complete text without moving the card or its connectors.
+
+### Editing
+
+The editor sheet contains:
+
+- **Identity:** Ticket #, Ticket Type, Sprint #, Epic
+- **Work:** Description
+- **Ownership:** Team, Reporter, Assignee
+- **State:** Status, Need By Date, On Hold, Needs VP
+
+The card remains visible as a live summary while values are edited. Moving the edited card is temporarily blocked until editing is finished.
+
+### Resizing
+
+A selected Kanban card exposes only an east-side width handle. Vertical and corner resize handles are intentionally omitted. Blank notes, labels, stickers, and frames retain their normal resizing behavior.
+
+## Kanban template fields
+
+1. Ticket #
+2. Ticket Type: Story, Bug, Subtask
+3. Sprint #
+4. Epic
+5. Description
+6. Team: SPA, PIC, PPD, CPPD, FES, R&A, P&BA, CMDSPT, HCM, SEC, EEO
+7. Reporter
+8. Assignee
+9. Status: Backlog, VP Scheduled, VP Held, Ready, In Dev, UAT, Done
+10. On Hold
+11. Needs VP?
+12. Need By Date
+
+Kanban fields participate in local autosave, search, filters, undo/redo, duplication, copy/paste, JSON import/export, PNG/PDF output, conversion to a blank note, and Clear Field Values.
 
 ## Sticker library
-
-The built-in sticker library contains:
 
 - Thumbs Up and Thumbs Down
 - Green Check
@@ -133,7 +176,7 @@ Stickers support placement, desktop drag-and-drop, movement, resizing, duplicati
 - `T`, `P`, `C`, `F` — Text, Pen, Connector, Frame
 - Arrow keys — Nudge selection by 1 pixel
 - `Shift + Arrow` — Nudge selection by 10 pixels
-- `Alt/Option + Arrow` — Resize selection
+- `Alt/Option + Arrow` — Resize selection; Kanban cards resize horizontally only
 - `Space + drag` — Temporarily pan from any tool
 - `Ctrl/Cmd + wheel` — Zoom at the pointer
 - `Ctrl/Cmd + Z` — Undo on the current board
@@ -147,30 +190,12 @@ Stickers support placement, desktop drag-and-drop, movement, resizing, duplicati
 - `1` — Fit content readably
 - `2` — Zoom to selection
 - `3` — Overview all content
-- `Enter` — Edit or open the primary action for a selected object
-- `Escape` — Finish editing, close a menu, clear selection, or cancel an operation
+- `Enter` — Open the Kanban editor or the primary action for the selected object
+- `Escape` — Finish Kanban editing, close a menu, clear selection, or cancel an operation
+- `Ctrl/Cmd + Enter` — Finish Kanban editing
 - `Delete` or `Backspace` — Delete selection
 
 Normal board shortcuts do not activate while the user is typing in an input, dropdown, date field, or text area.
-
-## Kanban template
-
-Kanban notes include these fields in order:
-
-1. Ticket #
-2. Ticket Type: Story, Bug, Subtask
-3. Sprint #
-4. Epic
-5. Description
-6. Team: SPA, PIC, PPD, CPPD, FES, R&A, P&BA, CMDSPT, HCM, SEC, EEO
-7. Reporter
-8. Assignee
-9. Status: Backlog, VP Scheduled, VP Held, Ready, In Dev, UAT, Done
-10. On Hold
-11. Needs VP?
-12. Need By Date
-
-Kanban notes support expanded and compact views, On Hold and Needs VP indicators, field-aware search and filters, clean exports, conversion to blank notes, duplication, color changes, connectors, grouping, locking, frames, local autosave, and undo/redo.
 
 ## Run the application
 
@@ -190,12 +215,14 @@ python3 -m http.server 8080
 
 Then open `http://localhost:8080`.
 
-After replacing an older deployment, reload once so the `tackboard-v1.2.2` service-worker cache takes control.
+After replacing an older deployment, reload once so the `tackboard-v1.3.0` service-worker cache takes control.
 
 ## Data, migration, and privacy
 
 - Existing compatible v1.x data is normalized into schema version 2 automatically.
-- Existing Kanban notes are migrated to Kanban template version 2; a missing On Hold field becomes unchecked.
+- Existing Kanban notes migrate to template version 2 and Kanban layout version 1.
+- A missing On Hold field becomes unchecked.
+- Old Kanban heights migrate to the canonical Compact or Expanded height without changing field values.
 - IndexedDB is the primary storage system.
 - localStorage is used only when IndexedDB is unavailable and for the emergency snapshot.
 - Use **Complete Backup JSON** for portable backups and before clearing browser data.

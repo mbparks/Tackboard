@@ -1,5 +1,5 @@
   /* -----------------------------------------------------------------------
-     TACKBOARD v1.2.2 enhancements
+     TACKBOARD v1.2 foundation with v1.3.0 compatibility
      ----------------------------------------------------------------------- */
   const V12_SCHEMA_VERSION = 2;
   const V12_INDEX_KEY = `${STATE_KEY}-index-v2`;

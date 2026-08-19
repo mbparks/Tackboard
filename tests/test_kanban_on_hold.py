@@ -26,7 +26,7 @@ def run() -> None:
             try:
                 page.set_content(html, wait_until="load")
                 page.wait_for_timeout(300)
-                assert_true(page.evaluate("window.TACKBOARD_DEBUG.version") == "1.2.2", "version mismatch")
+                assert_true(page.evaluate("window.TACKBOARD_DEBUG.version") == "1.3.0", "version mismatch")
 
                 note_id = page.evaluate("window.TACKBOARD_DEBUG.addKanbanNote({x:760,y:480}).id")
                 page.wait_for_timeout(120)

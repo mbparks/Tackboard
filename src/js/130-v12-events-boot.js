@@ -76,6 +76,7 @@
     window.addEventListener('beforeunload', () => {
       try { localStorage.setItem(`${STATE_KEY}-emergency`, JSON.stringify({ savedAt: Date.now(), state })); } catch {}
     });
+    if (typeof installV13KanbanEvents === 'function') installV13KanbanEvents();
   };
 
   function installV12PostBoot() {
@@ -106,6 +107,7 @@
         return board.id;
       }
     });
+    if (typeof installV13PostBoot === 'function') installV13PostBoot();
   }
 
 

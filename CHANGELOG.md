@@ -1,5 +1,20 @@
 # TACKBOARD changelog
 
+## v1.3.0 — Stable Kanban summary cards and detached editing
+
+- Replaced inline, variable-height Kanban editing with a detached paper-styled editor sheet.
+- Added stable Compact and Expanded summary-card heights so entering or leaving Edit Mode no longer changes the board layout.
+- Redesigned Expanded View with a prominent Description summary and a two-column metadata grid representing every field.
+- Added a Read more action for complete long descriptions without stretching the board card.
+- Added a desktop side editor and a mobile full-width bottom-sheet editor.
+- Organized editing into Identity, Work, Ownership, and State sections.
+- Limited Kanban manual resizing to width only, from 340 to 520 pixels, while preserving canonical Compact and Expanded heights.
+- Updated group resizing and keyboard resizing to follow the same Kanban sizing rules.
+- Migrated older manually sized Kanban cards while preserving position, supported width, field values, display mode, grouping, and connectors.
+- Added `kanbanLayoutVersion` metadata for future presentation migrations.
+- Updated PNG and PDF rendering to match the new Summary Card layout.
+- Added browser regression coverage for stable sizing, editor behavior, long descriptions, width-only resizing, Cancel, Undo, migration, and mobile editing.
+
 ## v1.2.2 — Kanban On Hold field
 
 - Added an **On Hold** checkbox immediately after Status in the Kanban template.
