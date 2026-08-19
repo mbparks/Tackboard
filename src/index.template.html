@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ece8df">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2715%27 fill=%27%23f5df83%27/%3E%3Cpath d=%27M20 16h24M32 16v34%27 stroke=%27%23252a2e%27 stroke-width=%275%27 stroke-linecap=%27round%27/%3E%3C/svg%3E">
+<title>TACKBOARD — Visual Thinking Space</title>
+<style>/*__TACKBOARD_STYLES__*/</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar" aria-label="Application toolbar">
+    <div class="brand" aria-label="TACKBOARD">
+      <div class="brand-mark" aria-hidden="true">T</div>
+      <div class="brand-copy">
+        <div class="brand-title">TACKBOARD</div>
+        <div class="brand-meta">v1.2.1 · LOCAL &amp; PRIVATE</div>
+      </div>
+    </div>
+
+    <button id="boardButton" class="board-button" type="button" aria-haspopup="menu" aria-expanded="false" title="Switch or manage boards">
+      <span class="icon-glyph" aria-hidden="true">▦</span>
+      <span id="currentBoardName" class="board-name">Untitled Board</span>
+      <span class="chevron" aria-hidden="true">▾</span>
+    </button>
+
+    <div class="top-separator"></div>
+    <button id="undoButton" class="icon-button" type="button" title="Undo (Ctrl/Cmd+Z)" aria-label="Undo" disabled><span class="icon-glyph" aria-hidden="true">↶</span></button>
+    <button id="redoButton" class="icon-button" type="button" title="Redo (Ctrl/Cmd+Shift+Z)" aria-label="Redo" disabled><span class="icon-glyph" aria-hidden="true">↷</span></button>
+
+    <div id="searchStrip" class="search-strip" role="search">
+      <span class="icon-glyph" aria-hidden="true">⌕</span>
+      <input id="searchInput" type="search" autocomplete="off" placeholder="Search this board…" aria-label="Search board">
+      <span id="searchCount" class="search-count">0 results</span>
+      <button id="searchPrev" class="mini-button" type="button" title="Previous result" aria-label="Previous search result">↑</button>
+      <button id="searchNext" class="mini-button" type="button" title="Next result" aria-label="Next search result">↓</button>
+      <button id="searchClose" class="mini-button" type="button" title="Close search" aria-label="Close search">×</button>
+    </div>
+
+    <div class="top-spacer"></div>
+    <button id="searchButton" class="icon-button" type="button" title="Search (Ctrl/Cmd+F)" aria-label="Search"><span class="icon-glyph" aria-hidden="true">⌕</span></button>
+    <button id="filterButton" class="icon-button" type="button" title="Filter Kanban notes" aria-label="Filter Kanban notes"><span class="icon-glyph" aria-hidden="true">≡</span></button>
+    <button id="exportButton" class="icon-button" type="button" title="Import and export" aria-label="Import and export"><span class="icon-glyph" aria-hidden="true">⇩</span></button>
+    <button id="settingsButton" class="icon-button" type="button" title="Settings" aria-label="Settings"><span class="icon-glyph" aria-hidden="true">⚙</span></button>
+    <button id="helpButton" class="icon-button" type="button" title="Help and keyboard shortcuts" aria-label="Help"><span class="icon-glyph" aria-hidden="true">?</span></button>
+    <button id="mobileMenuButton" class="icon-button mobile-only" type="button" title="More actions" aria-label="Open application menu"><span class="icon-glyph" aria-hidden="true">•••</span></button>
+    <button id="saveStatus" class="save-status" type="button" data-state="saved" aria-live="polite" aria-label="Local save status">
+      <span class="save-dot" aria-hidden="true"></span><span id="saveStatusText">Saved</span>
+    </button>
+  </header>
+
+  <div id="activeFilterBar" class="active-filter-bar" aria-label="Active filters"></div>
+  <div id="saveErrorBanner" class="save-error-banner" role="alert">
+    <div class="save-error-copy"><strong>Local save failed.</strong> <span id="saveErrorMessage">Your latest changes may not be stored.</span></div>
+    <div class="save-error-actions">
+      <button id="retrySaveButton" class="button primary" type="button">Retry Save</button>
+      <button id="backupNowButton" class="button" type="button">Export Backup</button>
+      <button id="dismissSaveErrorButton" class="button ghost" type="button" aria-label="Dismiss save warning">×</button>
+    </div>
+  </div>
+
+  <nav id="toolDock" class="tool-dock" aria-label="Whiteboard tools">
+    <button class="tool-button active" type="button" data-tool="select" aria-label="Select tool" aria-pressed="true" title="Select and marquee (V)"><span class="icon-glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3.5v16.2l4.3-4.1 3.2 5.4 3-1.8-3.2-5.2 5.9-1.1L5 3.5Z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+    <button class="tool-button" type="button" data-tool="pan" aria-label="Pan tool" aria-pressed="false" title="Pan board with left drag (H)"><span class="icon-glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.4 11V6.1a1.25 1.25 0 0 1 2.5 0v4.1h.5V4.9a1.25 1.25 0 0 1 2.5 0v5.3h.5V5.9a1.25 1.25 0 0 1 2.5 0v4.3h.5V7.7a1.25 1.25 0 0 1 2.5 0v5.55c0 4.5-2.65 7.25-6.85 7.25h-.75c-2.25 0-3.9-.75-5.25-2.35l-2.7-3.25a1.35 1.35 0 0 1 2.05-1.75l2 2.25V11Z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+    <button id="touchAddButton" class="tool-button mobile-only touch-add-button" type="button" aria-label="Add to touch selection" aria-pressed="false" title="Add or remove items from the touch selection"><span class="icon-glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4M12 8v8M8 12h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+    <div class="dock-divider" aria-hidden="true"></div>
+    <button id="stickyTool" class="tool-button" type="button" data-tool="sticky" aria-label="Sticky note tool" aria-pressed="false" title="Sticky Note (N)"><span class="icon-glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3.5h14v13l-4 4H5zM15 20.5v-4h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span><span class="tiny-caret" aria-hidden="true">▾</span></button>
+    <button id="stickerTool" class="tool-button" type="button" data-tool="sticker" aria-label="Sticker tool" aria-pressed="false" title="Sticker (S)"><span class="icon-glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/></svg></span><span class="tiny-caret" aria-hidden="true">▾</span></button>
+    <button class="tool-button" type="button" data-tool="text" aria-label="Text tool" aria-pressed="false" title="Text (T)"><span class="icon-glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 5h14M12 5v14M8.5 19h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+    <button class="tool-button" type="button" data-tool="pen" aria-label="Pen tool" aria-pressed="false" title="Pen (P)"><span class="icon-glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 20 3.8-.9L19 7.9a2.1 2.1 0 0 0-3-3L4.9 16.1ZM13.9 7l3.1 3.1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+    <button class="tool-button" type="button" data-tool="connector" aria-label="Connector tool" aria-pressed="false" title="Connector (C)"><span class="icon-glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18c4-9 8-10 14-12M14 5h5v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span></button>
+    <button class="tool-button" type="button" data-tool="frame" aria-label="Frame tool" aria-pressed="false" title="Frame (F)"><span class="icon-glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4 9h16" stroke="currentColor" stroke-width="1.7"/></svg></span></button>
+    <button class="tool-button" type="button" data-tool="eraser" aria-label="Eraser tool" aria-pressed="false" title="Eraser"><span class="icon-glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 15 7.7-9a2 2 0 0 1 2.8-.2l3 2.6a2 2 0 0 1 .2 2.8L11.1 20H7.3L5 18a2 2 0 0 1 0-3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 19-4-3.5M11 20h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span></button>
+    <div class="dock-divider"></div>
+    <button id="dockMoreButton" class="tool-button" type="button" aria-label="More drawing options" title="Drawing options"><span class="icon-glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg></span></button>
+    <span id="activeToolLabel" class="active-tool-label" aria-live="polite">Select</span>
+  </nav>
+
+  <main id="viewport" data-tool="select" tabindex="0" aria-label="TACKBOARD whiteboard canvas">
+    <div id="world" class="bg-dots">
+      <svg id="vectorLayer" viewBox="0 0 12000 8000" role="group" aria-label="Board drawings and connectors">
+        <defs>
+          <marker id="arrow-default" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="context-stroke"></path>
+          </marker>
+        </defs>
+        <g id="connectorGroup"></g>
+        <g id="drawingGroup"></g>
+        <path id="wirePreview" class="wire-preview" d="" hidden></path>
+      </svg>
+      <div id="objectLayer"></div>
+    </div>
+    <div id="marquee"></div>
+    <div id="selectionBox" class="selection-box" aria-hidden="true">
+      <button id="selectionBoxLabel" class="selection-box-label" type="button" data-group-drag="true"><span id="selectionBoxText">0 items selected</span><span id="selectionBoxLockCount" class="selection-box-lock-count"></span></button>
+      <span id="selectionBoxResize" class="selection-box-resize" data-group-resize="true" aria-hidden="true"></span>
+    </div>
+    <div id="exportAreaPreview" class="export-area-preview"></div>
+    <div id="selectionStatus" class="sr-only" aria-live="polite"></div>
+    <div id="framePreview"></div>
+    <div id="guideV" class="alignment-guide vertical"></div>
+    <div id="guideH" class="alignment-guide horizontal"></div>
+
+    <section id="emptyState" class="empty-state" aria-live="polite">
+      <div class="empty-card">
+        <div class="brand-mark" aria-hidden="true">T</div>
+        <h2>Make your thinking visible.</h2>
+        <p>Double-click anywhere to create your first note.</p>
+        <div class="empty-actions">
+          <button class="button" type="button" data-empty-action="blank">Blank Note</button>
+          <button class="button" type="button" data-empty-action="kanban">Kanban Note</button>
+          <button class="button" type="button" data-empty-action="sticker">Sticker</button>
+          <button class="button" type="button" data-empty-action="frame">Add Frame</button>
+          <button class="button" type="button" data-empty-action="example">Load Example</button>
+          <button class="button" type="button" data-empty-action="import">Import Board</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="contextToolbar" class="context-toolbar" role="toolbar" aria-label="Selection actions"></div>
+
+  <div class="viewport-controls" aria-label="Viewport controls">
+    <button id="zoomOut" type="button" title="Zoom out" aria-label="Zoom out">−</button>
+    <span id="zoomReadout" class="zoom-readout">100%</span>
+    <button id="zoomIn" type="button" title="Zoom in" aria-label="Zoom in">+</button>
+    <button id="fitButton" class="fit-button" type="button" title="Fit board readably (1)" aria-label="Fit board readably">⤢</button>
+    <button id="zoomSelectionButton" type="button" title="Zoom to selection (2)" aria-label="Zoom to selection">⌗</button>
+    <button id="overviewButton" type="button" title="Overview all content (3)" aria-label="Overview all content">◎</button>
+    <button id="resetButton" class="reset-button" type="button" title="Reset view (0)" aria-label="Reset view">⌂</button>
+    <button id="minimapButton" type="button" title="Toggle minimap" aria-label="Toggle minimap">▣</button>
+  </div>
+  <div id="minimapWrap" class="minimap-wrap"><canvas id="minimap" width="360" height="236" aria-label="Board minimap"></canvas></div>
+
+  <div id="popover" class="popover hidden" role="menu"></div>
+
+  <dialog id="dialog" aria-labelledby="dialogTitle">
+    <div class="dialog-header">
+      <h2 id="dialogTitle" class="dialog-title">Dialog</h2>
+      <button id="dialogClose" class="dialog-close" type="button" aria-label="Close dialog">×</button>
+    </div>
+    <div id="dialogBody" class="dialog-body"></div>
+    <div id="dialogFooter" class="dialog-footer"></div>
+  </dialog>
+
+  <input id="importInput" type="file" accept="application/json,.json" hidden>
+  <div id="toastHost" class="toast-host" aria-live="polite"></div>
+</div>
+
+<script>/*__TACKBOARD_APP__*/</script>
+</body>
+</html>
